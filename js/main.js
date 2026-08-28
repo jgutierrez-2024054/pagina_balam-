@@ -718,22 +718,23 @@ document.querySelectorAll('.nav-links a').forEach(link => {
 });
 
 // Dropdown toggle en móvil
-const dropdownToggle = document.querySelector('.dropdown-toggle');
-const dropdown = document.querySelector('.nav-dropdown');
+const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
 
-if(dropdownToggle && dropdown){
-  dropdownToggle.addEventListener('click', (e) => {
+dropdownToggles.forEach(toggle => {
+  toggle.addEventListener('click', (e) => {
     e.preventDefault();
+    const dropdown = toggle.closest('.nav-dropdown');
     dropdown.classList.toggle('open');
   });
+});
 
-  // Cerrar dropdown al hacer click en un link del dropdown
-  dropdown.querySelectorAll('.dropdown-menu a').forEach(link => {
-    link.addEventListener('click', () => {
-      dropdown.classList.remove('open');
-    });
+// Cerrar dropdown al hacer click en un link del dropdown
+document.querySelectorAll('.dropdown-menu a').forEach(link => {
+  link.addEventListener('click', () => {
+    const dropdown = link.closest('.nav-dropdown');
+    dropdown.classList.remove('open');
   });
-}
+});
 
 // Navegación
 elements.startExperience.addEventListener('click', () => {
