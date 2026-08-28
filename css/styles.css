@@ -751,19 +751,27 @@ header .room-tag{
 }
 .landing-btn{
   margin-top:40px;
-  background:var(--brass-soft);
-  border:none;
+  background:linear-gradient(135deg, var(--brass-soft) 0%, var(--brass) 100%);
+  border:1px solid var(--brass);
   color:var(--wall-3);
   font-family:'Space Grotesk', sans-serif;
   font-size:16px; letter-spacing:0.04em;
   padding:16px 40px;
   cursor:pointer;
-  transition:background .25s, transform .25s;
+  transition:all .3s ease;
   font-weight:500;
+  border-radius:4px;
+  box-shadow:0 4px 15px rgba(201,162,39,0.3);
+  text-transform:uppercase;
 }
 .landing-btn:hover{
-  background:var(--brass);
-  transform:translateY(-2px);
+  background:linear-gradient(135deg, var(--brass) 0%, var(--brass-soft) 100%);
+  transform:translateY(-3px);
+  box-shadow:0 6px 20px rgba(201,162,39,0.4);
+}
+.landing-btn:active{
+  transform:translateY(-1px);
+  box-shadow:0 2px 10px rgba(201,162,39,0.3);
 }
 
 /* ========== Estilos para Menú de Navegación ========== */
@@ -1101,8 +1109,9 @@ header .room-tag{
   
   .landing-btn{
     padding:12px 24px;
-    font-size:13px;
+    font-size:12px;
     margin-top:30px;
+    border-radius:3px;
   }
   
   /* Selector de salas */
