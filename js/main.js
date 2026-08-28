@@ -717,6 +717,24 @@ document.querySelectorAll('.nav-links a').forEach(link => {
   });
 });
 
+// Dropdown toggle en móvil
+const dropdownToggle = document.querySelector('.dropdown-toggle');
+const dropdown = document.querySelector('.nav-dropdown');
+
+if(dropdownToggle && dropdown){
+  dropdownToggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    dropdown.classList.toggle('open');
+  });
+
+  // Cerrar dropdown al hacer click en un link del dropdown
+  dropdown.querySelectorAll('.dropdown-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      dropdown.classList.remove('open');
+    });
+  });
+}
+
 // Navegación
 elements.startExperience.addEventListener('click', () => {
   renderRoomSelector();

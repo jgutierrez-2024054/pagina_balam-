@@ -22,32 +22,22 @@
     <span></span>
     <span></span>
   </button>
-  <div class="nav-links">
-    <div class="nav-column">
-      <div class="nav-column-title">Explorar</div>
-      <ul class="nav-column-links">
-        <li><a href="#/" data-nav="landing">Inicio</a></li>
-        <li><a href="#/selector" data-nav="collections">Colecciones disponibles</a></li>
-        <li><a href="#/libros" data-nav="books">Nuestros libros</a></li>
-        <li><a href="#/nosotros" data-nav="about">Nosotros</a></li>
-      </ul>
-    </div>
-    <div class="nav-column">
-      <div class="nav-column-title">Técnicas</div>
-      <ul class="nav-column-links">
+  <ul class="nav-links">
+    <li><a href="#/" data-nav="landing">Inicio</a></li>
+    <li><a href="#/selector" data-nav="collections">Colecciones</a></li>
+    <li><a href="#/libros" data-nav="books">Libros</a></li>
+    <li class="nav-dropdown">
+      <a href="#" class="dropdown-toggle">Categorías ▾</a>
+      <ul class="dropdown-menu">
         <li><a href="#/categoria/pintura">Pintura</a></li>
         <li><a href="#/categoria/dibujo">Dibujo</a></li>
         <li><a href="#/categoria/tinta-china">Tinta china</a></li>
-      </ul>
-    </div>
-    <div class="nav-column">
-      <div class="nav-column-title">Más categorías</div>
-      <ul class="nav-column-links">
         <li><a href="#/categoria/caricatura">Caricatura</a></li>
         <li><a href="#/categoria/fotografia">Fotografía</a></li>
       </ul>
-    </div>
-  </div>
+    </li>
+    <li><a href="#/nosotros" data-nav="about">Nosotros</a></li>
+  </ul>
 </nav>
 
 <!-- ========== VISTA 0: Landing Page ========== -->
