@@ -1,0 +1,20 @@
+{
+  "name": "balam-art-gallery",
+  "version": "1.0.0",
+  "description": "BALAM - Galería de Arte Virtual",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve . -p 3000"
+  },
+  "keywords": [
+    "art",
+    "gallery",
+    "virtual",
+    "exhibition"
+  ],
+  "author": "BALAM",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}

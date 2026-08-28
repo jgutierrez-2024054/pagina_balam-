@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BALAM — Galería de Arte Virtual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;1,9..144,400&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div id="cursor">VER</div>
+
+<!-- ========== MENÚ DE NAVEGACIÓN PRINCIPAL ========== -->
+<nav id="main-nav" class="main-nav">
+  <div class="nav-brand">BALAM</div>
+  <button id="menu-toggle" class="menu-toggle" aria-label="Menú">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+  <ul class="nav-links">
+    <li><a href="#/" data-nav="landing">Inicio</a></li>
+    <li><a href="#/selector" data-nav="collections">Colecciones</a></li>
+    <li><a href="#/libros" data-nav="books">Libros</a></li>
+    <li><a href="#/nosotros" data-nav="about">Nosotros</a></li>
+  </ul>
+</nav>
+
+<!-- ========== VISTA 0: Landing Page ========== -->
+<div id="view-landing" class="view">
+  <section id="landing-hero">
+    <div class="spot"></div>
+    <div class="eyebrow">Galería de arte virtual</div>
+    <h1>BAL<em>a</em>M</h1>
+    <p>Una colección privada, abierta al desplazamiento. Explora las salas y descubre cada obra en detalle.</p>
+    <button id="start-experience" class="landing-btn">Comienza tu experiencia</button>
+  </section>
+</div>
+
+<!-- ========== VISTA 4: Nuestros Libros ========== -->
+<div id="view-books" class="view" style="display:none;">
+  <header class="view-header">
+    <div class="brand">BALAM</div>
+    <div class="room-tag">Nuestros Libros</div>
+  </header>
+  
+  <main id="books-content">
+    <section id="books-hero">
+      <div class="spot"></div>
+      <div class="eyebrow">Publicaciones</div>
+      <h1>Nuestros Libros</h1>
+      <p>Catálogos de exhibición, monografías y publicaciones especiales de nuestra galería.</p>
+    </section>
+
+    <section id="books-grid">
+      <!-- Los libros se generan dinámicamente con JS -->
+    </section>
+  </main>
+</div>
+
+<!-- ========== VISTA 5: Acerca de Nosotros ========== -->
+<div id="view-about" class="view" style="display:none;">
+  <header class="view-header">
+    <div class="brand">BALAM</div>
+    <div class="room-tag">Acerca de Nosotros</div>
+  </header>
+  
+  <main id="about-content">
+    <section id="about-hero">
+      <div class="spot"></div>
+      <div class="eyebrow">Conoce la galería</div>
+      <h1>Acerca de Nosotros</h1>
+    </section>
+
+    <section id="about-text">
+      <div class="about-block">
+        <h2>BALAM</h2>
+        <p>BALAM es un espacio dedicado a la difusión del arte contemporáneo, donde cada obra cuenta una historia y cada sala es un viaje. Nuestra misión es hacer accesible el arte de calidad, creando puentes entre artistas y coleccionistas, y transformando la experiencia de ver arte en algo memorable y significativo.</p>
+        <p>Como galería virtual, BALAM rompe las barreras físicas del espacio tradicional, permitiendo que el arte llegue a cualquier lugar del mundo. Sin embargo, mantenemos una presencia física en Ciudad de Guatemala para quienes desean experimentar las obras en persona.</p>
+      </div>
+
+      <div class="about-block">
+        <h2>Nuestra Misión</h2>
+        <p>Creemos que el arte no debe estar encerrado, sino que debe ser un umbral hacia nuevas perspectivas, emociones y comprensiones del mundo que nos rodea. A través de nuestra colección curada y nuestras exhibiciones virtuales, buscamos inspirar, educar y conectar.</p>
+      </div>
+
+      <div class="about-block">
+        <h2>Información de Contacto</h2>
+        <div class="contact-info">
+          <div class="contact-item">
+            <span class="contact-label">Dirección:</span>
+            <span class="contact-value">Zona 4, Ciudad de Guatemala</span>
+          </div>
+          <div class="contact-item">
+            <span class="contact-label">Horario:</span>
+            <span class="contact-value">Martes a Sábado, 10:00 - 18:00</span>
+          </div>
+          <div class="contact-item">
+            <span class="contact-label">Email:</span>
+            <span class="contact-value">contacto@balam.gt</span>
+          </div>
+          <div class="contact-item">
+            <span class="contact-label">Teléfono:</span>
+            <span class="contact-value">+502 2222-0000</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ========== VISTA 1: Selector de Salas ========== -->
+<div id="view-selector" class="view" style="display:none;">
+  <header class="view-header">
+    <div class="brand">BALAM</div>
+    <div class="room-tag">Colecciones Disponibles</div>
+  </header>
+  
+  <section id="selector-hero">
+    <div class="spot"></div>
+    <div class="eyebrow">Galería de arte virtual</div>
+    <h1>BAL<em>a</em>M</h1>
+    <p>Una colección privada, abierta al desplazamiento. Explora las salas y descubre cada obra en detalle.</p>
+  </section>
+
+  <main id="rooms-grid">
+    <!-- Las salas se generan dinámicamente con JS -->
+  </main>
+
+  <section id="selector-outro">
+    <h2>¿Deseas visitar la galería en persona?</h2>
+    <p>Solicita una cita privada para conocer las obras originales o recibir el catálogo completo con disponibilidad actualizada.</p>
+    <div class="foot">BALAM — Galería de Arte · Ciudad de Guatemala</div>
+  </section>
+</div>
+
+<!-- ========== VISTA 2: Sala en pantalla completa ========== -->
+<div id="view-room" class="view" style="display:none;">
+  <header class="view-header room-header">
+    <button id="back-to-selector" class="nav-btn">← Salas</button>
+    <div class="room-tag" id="current-room-name">Sala I</div>
+  </header>
+
+  <div id="room-viewport">
+    <div class="photo-frame" id="room-photo-frame">
+      <img id="room-image" src="" alt="Fotografía de la sala">
+      <div class="vignette"></div>
+      <div id="room-hotspots"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para tooltip rápido (se mantiene para hover en Vista 2) -->
+<div id="modal-backdrop">
+  <div id="modal">
+    <button id="modal-close" aria-label="Cerrar">✕</button>
+    <div class="m-visual"><div class="canvas" id="m-canvas"></div><div class="glass"></div></div>
+    <div class="m-body">
+      <div class="m-eyebrow" id="m-eyebrow">Sala I · Obra 01</div>
+      <div class="m-title" id="m-title">Título de la obra</div>
+      <div class="m-artist" id="m-artist">Artista</div>
+      <div class="m-meta">
+        <div>Año <span id="m-year"></span></div>
+        <div>Técnica <span id="m-medium"></span></div>
+        <div>Dimensiones <span id="m-dims"></span></div>
+        <div>Disponibilidad <span id="m-avail">Disponible</span></div>
+      </div>
+      <div class="m-desc" id="m-desc"></div>
+      <div class="m-price">
+        <div class="amount" id="m-price"></div>
+        <button id="m-buy-btn">Comprar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== VISTA 3: Detalle de compra ========== -->
+<div id="view-purchase" class="view" style="display:none;">
+  <header class="view-header">
+    <button id="back-to-room" class="nav-btn">← Volver a la sala</button>
+    <div class="room-tag">Detalle de obra</div>
+  </header>
+
+  <main id="purchase-content">
+    <div class="purchase-visual">
+      <div class="canvas" id="purchase-canvas"></div>
+      <div class="glass"></div>
+    </div>
+
+    <div class="purchase-body">
+      <div class="purchase-eyebrow" id="purchase-eyebrow">Sala I · Obra 01</div>
+      <h2 class="purchase-title" id="purchase-title">Título de la obra</h2>
+      <div class="purchase-artist" id="purchase-artist">Artista, Año</div>
+      
+      <div class="purchase-meta">
+        <div>Año <span id="purchase-year"></span></div>
+        <div>Técnica <span id="purchase-medium"></span></div>
+        <div>Dimensiones <span id="purchase-dims"></span></div>
+        <div>Disponibilidad <span id="purchase-avail">Disponible</span></div>
+      </div>
+
+      <div class="purchase-desc" id="purchase-desc"></div>
+
+      <div class="purchase-price">
+        <div class="amount" id="purchase-price"></div>
+      </div>
+
+      <div class="payment-methods">
+        <h4>Métodos de pago disponibles</h4>
+        <div id="payment-options">
+          <!-- Opciones de pago generadas dinámicamente -->
+        </div>
+      </div>
+
+      <button id="confirm-purchase" class="purchase-btn">Confirmar interés</button>
+    </div>
+  </main>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
