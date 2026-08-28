@@ -819,32 +819,40 @@ header .room-tag{
   background:none;
   border:none;
   cursor:pointer;
-  padding:0;
+  padding:10px;
+  z-index:1001;
 }
 
 .menu-toggle span{
   width:25px;
-  height:2px;
+  height:3px;
   background:var(--ivory);
   transition:all .3s;
+  border-radius:2px;
 }
 
 @media (max-width: 760px){
   .main-nav{
-    padding:0 20px;
+    padding:0 15px;
+    height:60px;
+  }
+  
+  .nav-brand{
+    font-size:1.2rem;
   }
   
   .nav-links{
     position:fixed;
-    top:70px; left:0; right:0;
+    top:60px; left:0; right:0;
     background:var(--wall-2);
     flex-direction:column;
     gap:0;
-    padding:20px;
+    padding:0;
     transform:translateY(-100%);
     opacity:0;
     transition:transform .3s, opacity .3s;
     border-bottom:1px solid var(--line);
+    z-index:999;
   }
   
   .nav-links.open{
@@ -853,12 +861,17 @@ header .room-tag{
   }
   
   .nav-links li{
-    padding:15px 0;
+    padding:18px 20px;
     border-bottom:1px solid var(--line);
   }
   
   .nav-links li:last-child{
     border-bottom:none;
+  }
+  
+  .nav-links a{
+    font-size:16px;
+    color:var(--ivory);
   }
   
   .menu-toggle{
@@ -1033,98 +1046,136 @@ header .room-tag{
 @media (max-width: 480px){
   /* Ajustes generales */
   body{
-    font-size:14px;
+    font-size:13px;
   }
   
   /* Menú de navegación */
   .main-nav{
-    padding:0 15px;
-    height:60px;
+    padding:0 10px;
+    height:55px;
   }
   
   .nav-brand{
-    font-size:1.2rem;
+    font-size:1.1rem;
+  }
+  
+  .menu-toggle{
+    padding:8px;
+  }
+  
+  .menu-toggle span{
+    width:22px;
+    height:2px;
   }
   
   .nav-links{
-    top:60px;
-    padding:15px;
+    top:55px;
+    padding:0;
   }
   
   .nav-links li{
-    padding:12px 0;
+    padding:15px 15px;
+  }
+  
+  .nav-links a{
+    font-size:15px;
   }
   
   /* Landing page */
   #landing-hero{
-    padding:0 15px;
+    padding:0 10px;
+    min-height:100vh;
+    padding-top:55px;
   }
   
   #landing-hero h1{
-    font-size:2.5rem;
+    font-size:2rem;
+    line-height:1.1;
   }
   
   #landing-hero p{
-    font-size:14px;
+    font-size:13px;
     max-width:100%;
+    line-height:1.5;
   }
   
   .landing-btn{
-    padding:14px 30px;
-    font-size:14px;
+    padding:12px 24px;
+    font-size:13px;
+    margin-top:30px;
   }
   
   /* Selector de salas */
   #selector-hero{
-    padding:0 15px;
+    padding:0 10px;
+    padding-top:55px;
+    min-height:50vh;
   }
   
   #selector-hero h1{
-    font-size:2.5rem;
+    font-size:2rem;
+    line-height:1.1;
+  }
+  
+  #selector-hero p{
+    font-size:13px;
   }
   
   #rooms-grid{
-    padding:40px 15px;
+    padding:30px 10px;
     grid-template-columns:1fr;
-    gap:20px;
+    gap:15px;
   }
   
   .room-card .card-title{
-    font-size:1.2rem;
+    font-size:1.1rem;
+  }
+  
+  .room-card .card-theme{
+    font-size:11px;
   }
   
   #selector-outro{
-    padding:60px 15px;
+    padding:40px 10px;
   }
   
   #selector-outro h2{
-    font-size:1.4rem;
+    font-size:1.2rem;
   }
   
   #selector-outro p{
-    font-size:13px;
+    font-size:12px;
+  }
+  
+  #selector-outro .foot{
+    font-size:10px;
   }
   
   /* Vista de sala */
   .room-header{
-    padding:15px;
+    padding:10px;
+    top:55px;
   }
   
   .nav-btn{
-    padding:8px 14px;
-    font-size:12px;
+    padding:6px 12px;
+    font-size:11px;
   }
   
   .room-tag{
-    font-size:10px;
+    font-size:9px;
+  }
+  
+  #room-viewport{
+    height:calc(100vh - 55px);
   }
   
   /* Vista de compra */
   #purchase-content{
-    margin:80px auto 40px;
-    padding:0 15px;
+    margin:60px auto 30px;
+    padding:0 10px;
     grid-template-columns:1fr;
-    gap:30px;
+    gap:20px;
   }
   
   .purchase-visual{
@@ -1132,91 +1183,169 @@ header .room-tag{
   }
   
   .purchase-title{
-    font-size:1.6rem;
+    font-size:1.4rem;
+  }
+  
+  .purchase-artist{
+    font-size:13px;
   }
   
   .purchase-meta{
     grid-template-columns:1fr;
-    gap:10px;
+    gap:8px;
+    font-size:11px;
+  }
+  
+  .purchase-meta span{
+    font-size:12px;
+  }
+  
+  .purchase-desc{
+    font-size:13px;
+    line-height:1.6;
   }
   
   .purchase-price .amount{
-    font-size:1.6rem;
+    font-size:1.4rem;
+  }
+  
+  .payment-methods h4{
+    font-size:11px;
+  }
+  
+  .payment-option{
+    padding:12px 15px;
+  }
+  
+  .payment-option label{
+    font-size:13px;
   }
   
   .purchase-btn{
-    padding:14px 24px;
-    font-size:14px;
+    padding:12px 20px;
+    font-size:13px;
   }
   
   /* Modal */
   #modal{
     grid-template-columns:1fr;
-    max-height:90vh;
+    max-height:95vh;
+    margin:10px;
   }
   
   #modal .m-body{
-    padding:30px 20px;
+    padding:20px 15px;
   }
   
   #modal .m-title{
-    font-size:1.4rem;
+    font-size:1.2rem;
+  }
+  
+  #modal .m-artist{
+    font-size:13px;
+  }
+  
+  #modal .m-meta{
+    grid-template-columns:1fr;
+    gap:8px;
+    font-size:10px;
+  }
+  
+  #modal .m-meta span{
+    font-size:11px;
+  }
+  
+  #modal .m-desc{
+    font-size:13px;
   }
   
   #modal .m-price .amount{
-    font-size:1.4rem;
+    font-size:1.3rem;
   }
   
   #modal .m-price button{
-    padding:10px 16px;
-    font-size:12px;
+    padding:8px 14px;
+    font-size:11px;
   }
   
   /* Libros */
   #books-hero{
-    padding:0 15px;
-    margin-top:60px;
+    padding:0 10px;
+    margin-top:55px;
+    min-height:40vh;
   }
   
   #books-hero h1{
-    font-size:2rem;
+    font-size:1.8rem;
+  }
+  
+  #books-hero p{
+    font-size:13px;
   }
   
   #books-grid{
-    padding:40px 15px;
+    padding:30px 10px;
+    gap:15px;
+  }
+  
+  .book-info{
+    padding:15px;
   }
   
   .book-info h3{
-    font-size:1rem;
+    font-size:0.95rem;
   }
   
   .book-info .author{
-    font-size:13px;
+    font-size:12px;
+  }
+  
+  .book-info .year{
+    font-size:11px;
+  }
+  
+  .book-info .price{
+    font-size:14px;
   }
   
   /* About */
   #about-hero{
-    padding:0 15px;
-    margin-top:60px;
+    padding:0 10px;
+    margin-top:55px;
+    min-height:40vh;
   }
   
   #about-hero h1{
-    font-size:2rem;
+    font-size:1.8rem;
   }
   
   #about-text{
-    padding:40px 15px;
+    padding:30px 10px;
+  }
+  
+  .about-block{
+    margin-bottom:40px;
   }
   
   .about-block h2{
-    font-size:1.4rem;
+    font-size:1.2rem;
   }
   
   .about-block p{
-    font-size:14px;
+    font-size:13px;
+    line-height:1.6;
+  }
+  
+  .contact-item{
+    gap:8px;
   }
   
   .contact-label{
     min-width:auto;
+    font-size:11px;
+  }
+  
+  .contact-value{
+    font-size:13px;
   }
 }
