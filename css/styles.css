@@ -1028,3 +1028,195 @@ header .room-tag{
     gap:4px;
   }
 }
+
+/* ========== Estilos específicos para teléfonos ========== */
+@media (max-width: 480px){
+  /* Ajustes generales */
+  body{
+    font-size:14px;
+  }
+  
+  /* Menú de navegación */
+  .main-nav{
+    padding:0 15px;
+    height:60px;
+  }
+  
+  .nav-brand{
+    font-size:1.2rem;
+  }
+  
+  .nav-links{
+    top:60px;
+    padding:15px;
+  }
+  
+  .nav-links li{
+    padding:12px 0;
+  }
+  
+  /* Landing page */
+  #landing-hero{
+    padding:0 15px;
+  }
+  
+  #landing-hero h1{
+    font-size:2.5rem;
+  }
+  
+  #landing-hero p{
+    font-size:14px;
+    max-width:100%;
+  }
+  
+  .landing-btn{
+    padding:14px 30px;
+    font-size:14px;
+  }
+  
+  /* Selector de salas */
+  #selector-hero{
+    padding:0 15px;
+  }
+  
+  #selector-hero h1{
+    font-size:2.5rem;
+  }
+  
+  #rooms-grid{
+    padding:40px 15px;
+    grid-template-columns:1fr;
+    gap:20px;
+  }
+  
+  .room-card .card-title{
+    font-size:1.2rem;
+  }
+  
+  #selector-outro{
+    padding:60px 15px;
+  }
+  
+  #selector-outro h2{
+    font-size:1.4rem;
+  }
+  
+  #selector-outro p{
+    font-size:13px;
+  }
+  
+  /* Vista de sala */
+  .room-header{
+    padding:15px;
+  }
+  
+  .nav-btn{
+    padding:8px 14px;
+    font-size:12px;
+  }
+  
+  .room-tag{
+    font-size:10px;
+  }
+  
+  /* Vista de compra */
+  #purchase-content{
+    margin:80px auto 40px;
+    padding:0 15px;
+    grid-template-columns:1fr;
+    gap:30px;
+  }
+  
+  .purchase-visual{
+    aspect-ratio:3/4;
+  }
+  
+  .purchase-title{
+    font-size:1.6rem;
+  }
+  
+  .purchase-meta{
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  
+  .purchase-price .amount{
+    font-size:1.6rem;
+  }
+  
+  .purchase-btn{
+    padding:14px 24px;
+    font-size:14px;
+  }
+  
+  /* Modal */
+  #modal{
+    grid-template-columns:1fr;
+    max-height:90vh;
+  }
+  
+  #modal .m-body{
+    padding:30px 20px;
+  }
+  
+  #modal .m-title{
+    font-size:1.4rem;
+  }
+  
+  #modal .m-price .amount{
+    font-size:1.4rem;
+  }
+  
+  #modal .m-price button{
+    padding:10px 16px;
+    font-size:12px;
+  }
+  
+  /* Libros */
+  #books-hero{
+    padding:0 15px;
+    margin-top:60px;
+  }
+  
+  #books-hero h1{
+    font-size:2rem;
+  }
+  
+  #books-grid{
+    padding:40px 15px;
+  }
+  
+  .book-info h3{
+    font-size:1rem;
+  }
+  
+  .book-info .author{
+    font-size:13px;
+  }
+  
+  /* About */
+  #about-hero{
+    padding:0 15px;
+    margin-top:60px;
+  }
+  
+  #about-hero h1{
+    font-size:2rem;
+  }
+  
+  #about-text{
+    padding:40px 15px;
+  }
+  
+  .about-block h2{
+    font-size:1.4rem;
+  }
+  
+  .about-block p{
+    font-size:14px;
+  }
+  
+  .contact-label{
+    min-width:auto;
+  }
+}
