@@ -22,12 +22,32 @@
     <span></span>
     <span></span>
   </button>
-  <ul class="nav-links">
-    <li><a href="#/" data-nav="landing">Inicio</a></li>
-    <li><a href="#/selector" data-nav="collections">Colecciones</a></li>
-    <li><a href="#/libros" data-nav="books">Libros</a></li>
-    <li><a href="#/nosotros" data-nav="about">Nosotros</a></li>
-  </ul>
+  <div class="nav-links">
+    <div class="nav-column">
+      <div class="nav-column-title">Explorar</div>
+      <ul class="nav-column-links">
+        <li><a href="#/" data-nav="landing">Inicio</a></li>
+        <li><a href="#/selector" data-nav="collections">Colecciones disponibles</a></li>
+        <li><a href="#/libros" data-nav="books">Nuestros libros</a></li>
+        <li><a href="#/nosotros" data-nav="about">Nosotros</a></li>
+      </ul>
+    </div>
+    <div class="nav-column">
+      <div class="nav-column-title">Técnicas</div>
+      <ul class="nav-column-links">
+        <li><a href="#/categoria/pintura">Pintura</a></li>
+        <li><a href="#/categoria/dibujo">Dibujo</a></li>
+        <li><a href="#/categoria/tinta-china">Tinta china</a></li>
+      </ul>
+    </div>
+    <div class="nav-column">
+      <div class="nav-column-title">Más categorías</div>
+      <ul class="nav-column-links">
+        <li><a href="#/categoria/caricatura">Caricatura</a></li>
+        <li><a href="#/categoria/fotografia">Fotografía</a></li>
+      </ul>
+    </div>
+  </div>
 </nav>
 
 <!-- ========== VISTA 0: Landing Page ========== -->
@@ -68,7 +88,7 @@
     <div class="brand">BALAM</div>
     <div class="room-tag">Acerca de Nosotros</div>
   </header>
-  
+
   <main id="about-content">
     <section id="about-hero">
       <div class="spot"></div>
@@ -109,6 +129,35 @@
           </div>
         </div>
       </div>
+    </section>
+  </main>
+</div>
+
+<!-- ========== VISTA 6: Página de Categoría ========== -->
+<div id="view-category" class="view" style="display:none;">
+  <header class="view-header">
+    <div class="brand">BALAM</div>
+    <div class="room-tag" id="category-room-tag">Categoría</div>
+  </header>
+
+  <main id="category-content">
+    <section id="category-hero">
+      <div class="spot"></div>
+      <div class="eyebrow">Categoría</div>
+      <h1 id="category-title">Pintura</h1>
+    </section>
+
+    <section id="category-description">
+      <p id="category-desc-text">Próximamente encontrarás aquí piezas en óleo, acrílico y técnica mixta de nuestros artistas.</p>
+    </section>
+
+    <section id="category-status">
+      <div class="status-badge">Próximamente</div>
+      <p class="status-text">Sección en construcción</p>
+    </section>
+
+    <section id="category-back">
+      <button id="category-back-btn" class="category-back-btn">← Volver a Colecciones</button>
     </section>
   </main>
 </div>

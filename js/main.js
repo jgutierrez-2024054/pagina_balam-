@@ -184,6 +184,17 @@ const BOOKS = [
   }
 ];
 
+// Descripciones placeholder para las 5 categorías nuevas
+// NOTA: Estas descripciones son temporales. Cuando esté listo el contenido real,
+// reemplazar estas descripciones con el contenido de las obras de cada categoría.
+const CATEGORY_PLACEHOLDERS = {
+  pintura: "Próximamente encontrarás aquí piezas en óleo, acrílico y técnica mixta de nuestros artistas.",
+  dibujo: "Próximamente encontrarás aquí obras en grafito, carboncillo, pastel y otras técnicas de dibujo.",
+  "tinta-china": "Próximamente encontrarás aquí obras tradicionales y contemporáneas en tinta china.",
+  caricatura: "Próximamente encontrarás aquí obras de caricatura y sátira visual de nuestros artistas.",
+  fotografia: "Próximamente encontrarás aquí fotografía artística, documental y experimental."
+};
+
 /* ============================================================
    SISTEMA DE ROUTING Y NAVEGACIÓN
    ============================================================ */
@@ -199,7 +210,8 @@ const views = {
   room: document.getElementById('view-room'),
   purchase: document.getElementById('view-purchase'),
   books: document.getElementById('view-books'),
-  about: document.getElementById('view-about')
+  about: document.getElementById('view-about'),
+  category: document.getElementById('view-category')
 };
 
 const elements = {
@@ -217,7 +229,11 @@ const elements = {
   modalClose: document.getElementById('modal-close'),
   mBuyBtn: document.getElementById('m-buy-btn'),
   confirmPurchase: document.getElementById('confirm-purchase'),
-  paymentOptions: document.getElementById('payment-options')
+  paymentOptions: document.getElementById('payment-options'),
+  categoryTitle: document.getElementById('category-title'),
+  categoryDescText: document.getElementById('category-desc-text'),
+  categoryRoomTag: document.getElementById('category-room-tag'),
+  categoryBackBtn: document.getElementById('category-back-btn')
 };
 
 // Función para generar gradiente desde paleta
@@ -406,6 +422,36 @@ function renderHotspots(room){
 }
 
 /* ============================================================
+   VISTA 6: Página de Categoría
+   ============================================================ */
+
+function navigateToCategory(categoryId){
+  // Verificar si la categoría existe en los placeholders
+  if(!CATEGORY_PLACEHOLDERS[categoryId]){
+    // Si no existe, redirigir a colecciones
+    switchView('selector');
+    return;
+  }
+
+  // Obtener el nombre formateado de la categoría
+  const categoryNames = {
+    pintura: 'Pintura',
+    dibujo: 'Dibujo',
+    'tinta-china': 'Tinta China',
+    caricatura: 'Caricatura',
+    fotografia: 'Fotografía'
+  };
+
+  // Llenar datos de la categoría
+  elements.categoryTitle.textContent = categoryNames[categoryId] || categoryId;
+  elements.categoryDescText.textContent = CATEGORY_PLACEHOLDERS[categoryId];
+  elements.categoryRoomTag.textContent = categoryNames[categoryId] || categoryId;
+
+  // Cambiar vista
+  switchView('category');
+}
+
+/* ============================================================
    VISTA 3: Detalle de Compra
    ============================================================ */
 
@@ -526,7 +572,7 @@ function switchView(viewName, roomIndex = null){
 
 function handleHashChange(){
   const hash = window.location.hash;
-  
+
   if(hash === '#/' || hash === ''){
     switchView('landing');
   } else if(hash === '#/selector'){
@@ -537,6 +583,9 @@ function handleHashChange(){
     switchView('books');
   } else if(hash === '#/nosotros'){
     switchView('about');
+  } else if(hash.startsWith('#/categoria/')){
+    const categoryId = hash.split('/')[2];
+    navigateToCategory(categoryId);
   } else if(hash.startsWith('#/sala/')){
     const index = parseInt(hash.split('/')[2]);
     if(!isNaN(index) && index >= 0 && index < getAllRooms().length){
@@ -546,11 +595,11 @@ function handleHashChange(){
     const parts = hash.split('/');
     const roomId = parseInt(parts[2]);
     const artId = parts[3];
-    
+
     if(!isNaN(roomId)){
       const allRooms = getAllRooms();
       const room = allRooms[roomId];
-      
+
       if(room){
         // Buscar la obra
         let artwork = null;
@@ -559,7 +608,7 @@ function handleHashChange(){
         } else if(room.artworks){
           artwork = room.artworks.find(a => a.id === artId);
         }
-        
+
         if(artwork){
           currentHotspotData = {...artwork, roomId: roomId};
           navigateToPurchase(artwork);
@@ -569,7 +618,7 @@ function handleHashChange(){
   } else if(hash.startsWith('#/libro/')){
     const bookId = hash.split('/')[2];
     const book = BOOKS.find(b => b.id === bookId);
-    
+
     if(book){
       currentHotspotData = {...book, isBook: true};
       navigateToPurchase(book);
@@ -684,6 +733,9 @@ elements.backToRoom.addEventListener('click', () => {
     switchView('selector');
   }
 });
+
+// Botón volver en vista de categoría
+elements.categoryBackBtn.addEventListener('click', () => switchView('selector'));
 
 // Modal
 elements.modalClose.addEventListener('click', closeModal);
