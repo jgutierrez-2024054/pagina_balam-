@@ -203,6 +203,11 @@ const CATEGORY_PLACEHOLDERS = {
 let currentRoomIndex = null;
 let currentHotspotData = null;
 
+// Detectar si es dispositivo móvil
+const isMobile = () => {
+  return window.innerWidth <= 760 || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+};
+
 // Elementos DOM
 const views = {
   landing: document.getElementById('view-landing'),
@@ -330,64 +335,74 @@ function navigateToRoom(index){
   currentRoomIndex = index;
   const allRooms = getAllRooms();
   const room = allRooms[index];
-  
+
   // Actualizar nombre de sala
   elements.currentRoomName.textContent = room.name;
-  
-  // Configurar imagen o gradiente de fondo
-  if(room.image){
-    elements.roomImage.src = room.image;
-    elements.roomImage.style.display = 'block';
-  } else {
-    elements.roomImage.style.display = 'none';
-    elements.roomPhotoFrame.style.backgroundImage = room.artworks[0] 
-      ? gradientFor(room.artworks[0].palette)
-      : 'linear-gradient(160deg, var(--wall-2), var(--wall-3))';
-    elements.roomPhotoFrame.style.backgroundSize = 'cover';
-    elements.roomPhotoFrame.style.backgroundPosition = 'center';
-  }
-  
-  // Renderizar hotspots
-  renderHotspots(room);
-  
-  // Cambiar vista con animación
-  switchView('room', index);
-}
 
-function renderHotspots(room){
+  // Actualizar imagen
+  elements.roomImage.style.backgroundImage = `url('${room.image}')`;
+
+  // Limpiar hotspots anteriores
   elements.roomHotspots.innerHTML = '';
-  
-  const hotspots = room.hotspots || [];
-  
-  hotspots.forEach((h, hi) => {
-    const btn = document.createElement('button');
-    btn.className = 'hotspot' + (h.top < 30 ? ' tip-below' : '');
-    btn.style.left = h.left + '%';
-    btn.style.top = h.top + '%';
-    btn.style.width = h.width + '%';
-    btn.style.height = h.height + '%';
-    btn.setAttribute('aria-label', `${h.title} — ${h.price}`);
-    btn.dataset.hotspotIndex = hi;
-    
-    btn.innerHTML = `
-      <span class="dot"></span>
-      <span class="tip">
-        <span class="tip-title">${h.title}</span>
-        <span class="tip-artist">${h.artist}, ${h.year}</span>
-        <span class="tip-desc">${h.desc}</span>
-        <span class="tip-price">${h.price}</span>
-      </span>
-    `;
-    
-    // Click para abrir modal
-    btn.addEventListener('click', () => {
-      currentHotspotData = h;
-      openModal(h);
+
+  // Agregar mensaje indicativo para móvil
+  if(isMobile()){
+    const mobileHint = document.createElement('div');
+    mobileHint.className = 'mobile-hint';
+    mobileHint.textContent = 'Doble tap en los puntos para ver detalles';
+    elements.roomHotspots.appendChild(mobileHint);
+  }
+
+  // Si tiene hotspots (PHOTO_SCENES), crear botones
+  if(room.hotspots){
+    room.hotspots.forEach((h, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'hotspot';
+      btn.style.left = h.x + '%';
+      btn.style.top = h.y + '%';
+      btn.style.width = h.w + '%';
+      btn.style.height = h.h + '%';
+      btn.setAttribute('aria-label', `${h.title} — ${h.price}`);
+
+      btn.innerHTML = `
+        <span class="dot"></span>
+        <span class="tip">
+          <span class="tip-title">${h.title}</span>
+          <span class="tip-artist">${h.artist}, ${h.year}</span>
+          <span class="tip-desc">${h.desc}</span>
+          <span class="tip-price">${h.price}</span>
+        </span>
+      `;
+
+      // En móvil: doble click, en desktop: click normal
+      if(isMobile()){
+        let lastClick = 0;
+        btn.addEventListener('click', (e) => {
+          const now = Date.now();
+          const timeDiff = now - lastClick;
+
+          if(timeDiff < 300 && timeDiff > 0){
+            // Doble click detectado
+            currentHotspotData = h;
+            openModal(h);
+            lastClick = 0;
+          } else {
+            // Primer click
+            lastClick = now;
+          }
+        });
+      } else {
+        // Click normal en desktop
+        btn.addEventListener('click', () => {
+          currentHotspotData = h;
+          openModal(h);
+        });
+      }
+
+      elements.roomHotspots.appendChild(btn);
     });
-    
-    elements.roomHotspots.appendChild(btn);
-  });
-  
+  }
+
   // Si es sala de relleno (ROOMS), crear hotspots para cada artwork
   if(room.artworks && !room.hotspots){
     room.artworks.forEach((art, ai) => {
@@ -400,7 +415,7 @@ function renderHotspots(room){
       btn.style.height = '20%';
       btn.setAttribute('aria-label', `${art.title} — ${art.price}`);
       btn.dataset.artworkIndex = ai;
-      
+
       btn.innerHTML = `
         <span class="dot"></span>
         <span class="tip">
@@ -410,15 +425,38 @@ function renderHotspots(room){
           <span class="tip-price">${art.price}</span>
         </span>
       `;
-      
-      btn.addEventListener('click', () => {
-        currentHotspotData = {...art, roomId: currentRoomIndex, artIndex: ai};
-        openModal(art);
-      });
-      
+
+      // En móvil: doble click, en desktop: click normal
+      if(isMobile()){
+        let lastClick = 0;
+        btn.addEventListener('click', (e) => {
+          const now = Date.now();
+          const timeDiff = now - lastClick;
+
+          if(timeDiff < 300 && timeDiff > 0){
+            // Doble click detectado
+            currentHotspotData = {...art, roomId: currentRoomIndex, artIndex: ai};
+            openModal(art);
+            lastClick = 0;
+          } else {
+            // Primer click
+            lastClick = now;
+          }
+        });
+      } else {
+        // Click normal en desktop
+        btn.addEventListener('click', () => {
+          currentHotspotData = {...art, roomId: currentRoomIndex, artIndex: ai};
+          openModal(art);
+        });
+      }
+
       elements.roomHotspots.appendChild(btn);
     });
   }
+
+  // Cambiar vista con animación
+  switchView('room', index);
 }
 
 /* ============================================================

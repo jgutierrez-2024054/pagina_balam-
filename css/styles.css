@@ -1125,6 +1125,29 @@ header .room-tag{
   body{
     font-size:13px;
   }
+
+  /* Mensaje indicativo para móvil */
+  .mobile-hint{
+    position:absolute;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(20,26,22,0.9);
+    color:var(--ivory);
+    font-family:'Space Grotesk', sans-serif;
+    font-size:12px;
+    padding:10px 20px;
+    border-radius:20px;
+    border:1px solid var(--brass);
+    z-index:100;
+    white-space:nowrap;
+    animation:fadeIn 0.5s ease;
+  }
+
+  @keyframes fadeIn{
+    from{ opacity:0; transform:translateX(-50%) translateY(10px); }
+    to{ opacity:1; transform:translateX(-50%) translateY(0); }
+  }
   
   /* Menú de navegación */
   .main-nav{
