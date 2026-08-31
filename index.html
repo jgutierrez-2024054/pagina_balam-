@@ -17,28 +17,43 @@
 <!-- ========== MENÚ DE NAVEGACIÓN PRINCIPAL ========== -->
 <nav id="main-nav" class="main-nav">
   <div class="nav-brand">BALAM</div>
-  <button id="menu-toggle" class="menu-toggle" aria-label="Menú">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
-  <ul class="nav-links">
-    <li><a href="#/" data-nav="landing">Inicio</a></li>
-    <li class="nav-dropdown">
-      <a href="#" class="dropdown-toggle">Categorías ▾</a>
-      <ul class="dropdown-menu">
-        <li><a href="#/selector" data-nav="collections">Colecciones</a></li>
-        <li><a href="#/libros" data-nav="books">Libros</a></li>
+  <div class="nav-main-links">
+    <a href="#/" data-nav="landing">Inicio</a>
+    <button id="categories-toggle" class="categories-toggle">
+      <span>Categorías</span>
+      <span class="chevron">▾</span>
+    </button>
+    <a href="#/nosotros" data-nav="about">Nosotros</a>
+  </div>
+</nav>
+
+<!-- ========== PANEL DESPLEGABLE DE CATEGORÍAS ========== -->
+<div id="categories-panel" class="categories-panel">
+  <div class="panel-content">
+    <div class="panel-column">
+      <div class="panel-column-title">Explorar</div>
+      <ul class="panel-column-links">
+        <li><a href="#/selector" data-nav="collections">Colecciones disponibles</a></li>
+        <li><a href="#/libros" data-nav="books">Nuestros libros</a></li>
+      </ul>
+    </div>
+    <div class="panel-column">
+      <div class="panel-column-title">Técnicas</div>
+      <ul class="panel-column-links">
         <li><a href="#/categoria/pintura">Pintura</a></li>
         <li><a href="#/categoria/dibujo">Dibujo</a></li>
         <li><a href="#/categoria/tinta-china">Tinta china</a></li>
+      </ul>
+    </div>
+    <div class="panel-column">
+      <div class="panel-column-title">Más categorías</div>
+      <ul class="panel-column-links">
         <li><a href="#/categoria/caricatura">Caricatura</a></li>
         <li><a href="#/categoria/fotografia">Fotografía</a></li>
       </ul>
-    </li>
-    <li><a href="#/nosotros" data-nav="about">Nosotros</a></li>
-  </ul>
-</nav>
+    </div>
+  </div>
+</div>
 
 <!-- ========== VISTA 0: Landing Page ========== -->
 <div id="view-landing" class="view">

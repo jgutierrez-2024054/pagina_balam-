@@ -215,8 +215,8 @@ const views = {
 };
 
 const elements = {
-  menuToggle: document.getElementById('menu-toggle'),
-  navLinks: document.querySelector('.nav-links'),
+  categoriesToggle: document.getElementById('categories-toggle'),
+  categoriesPanel: document.getElementById('categories-panel'),
   startExperience: document.getElementById('start-experience'),
   roomsGrid: document.getElementById('rooms-grid'),
   booksGrid: document.getElementById('books-grid'),
@@ -703,36 +703,67 @@ function closeModal(){
    Event Listeners
    ============================================================ */
 
-// Menú hamburguesa
-elements.menuToggle.addEventListener('click', () => {
-  elements.menuToggle.classList.toggle('active');
-  elements.navLinks.classList.toggle('open');
+// Panel desplegable de categorías
+let isPanelOpen = false;
+
+function toggleCategoriesPanel(){
+  isPanelOpen = !isPanelOpen;
+  
+  if(isPanelOpen){
+    // Abrir panel con animación GSAP
+    elements.categoriesToggle.classList.add('active');
+    gsap.to(elements.categoriesPanel, {
+      height: 'auto',
+      duration: 0.35,
+      ease: 'power2.out'
+    });
+  } else {
+    // Cerrar panel con animación GSAP
+    elements.categoriesToggle.classList.remove('active');
+    gsap.to(elements.categoriesPanel, {
+      height: 0,
+      duration: 0.3,
+      ease: 'power2.in'
+    });
+  }
+}
+
+function closeCategoriesPanel(){
+  if(isPanelOpen){
+    isPanelOpen = false;
+    elements.categoriesToggle.classList.remove('active');
+    gsap.to(elements.categoriesPanel, {
+      height: 0,
+      duration: 0.3,
+      ease: 'power2.in'
+    });
+  }
+}
+
+// Click en botón de categorías
+elements.categoriesToggle.addEventListener('click', (e) => {
+  e.stopPropagation();
+  toggleCategoriesPanel();
 });
 
-// Cerrar menú al hacer click en un link (móvil)
-document.querySelectorAll('.nav-links a').forEach(link => {
+// Click fuera del panel para cerrar
+document.addEventListener('click', (e) => {
+  if(isPanelOpen && !elements.categoriesPanel.contains(e.target) && !elements.categoriesToggle.contains(e.target)){
+    closeCategoriesPanel();
+  }
+});
+
+// Tecla ESC para cerrar panel
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && isPanelOpen){
+    closeCategoriesPanel();
+  }
+});
+
+// Click en links del panel para cerrar
+document.querySelectorAll('.panel-column-links a').forEach(link => {
   link.addEventListener('click', () => {
-    elements.menuToggle.classList.remove('active');
-    elements.navLinks.classList.remove('open');
-  });
-});
-
-// Dropdown toggle en móvil
-const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-
-dropdownToggles.forEach(toggle => {
-  toggle.addEventListener('click', (e) => {
-    e.preventDefault();
-    const dropdown = toggle.closest('.nav-dropdown');
-    dropdown.classList.toggle('open');
-  });
-});
-
-// Cerrar dropdown al hacer click en un link del dropdown
-document.querySelectorAll('.dropdown-menu a').forEach(link => {
-  link.addEventListener('click', () => {
-    const dropdown = link.closest('.nav-dropdown');
-    dropdown.classList.remove('open');
+    closeCategoriesPanel();
   });
 });
 
