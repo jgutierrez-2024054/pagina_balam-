@@ -12,7 +12,7 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 const prisma = new PrismaClient();
 const uploadsDir = path.join(__dirname, '..', 'uploads');
-const isServerless = Boolean(process.env.VERCEL);
+const isServerless = Boolean(process.env.VERCEL) || process.env.NODE_ENV === 'production';
 
 // Vercel ejecuta las funciones en un sistema de archivos de solo lectura.
 // La carpeta local se conserva para desarrollo, pero no debe crearse al
