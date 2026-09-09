@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run postinstall",
+  "buildCommand": "npx prisma migrate deploy && if [ \"$VERCEL_ENV\" = \"production\" ]; then npm run prisma:seed; fi && npm run postinstall",
   "rewrites": [
     {
       "source": "/api/:match*",
