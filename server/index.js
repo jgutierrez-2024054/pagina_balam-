@@ -41,6 +41,15 @@ function cleanString(value, max = 5000) {
   return String(value).trim().slice(0, max);
 }
 
+function createSlug(value) {
+  return cleanString(value, 80)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 function parsePriceToAmount(priceString) {
   if (typeof priceString === 'number' && Number.isFinite(priceString)) return Math.round(priceString);
   const numericString = cleanString(priceString).replace(/[^0-9]/g, '');
@@ -268,8 +277,8 @@ app.delete('/api/books/:id', authenticateToken, requireAdmin, async (req, res) =
 // ========================= CATEGORÍAS =========================
 app.get('/api/categories', async (req, res) => { try { res.json(await prisma.category.findMany({ include: { artworks: true }, orderBy: { name: 'asc' } })); } catch (error) { handlePrismaError(error, res, 'Error al obtener categorías.'); } });
 app.get('/api/categories/:slug', async (req, res) => { try { const category = await prisma.category.findUnique({ where: { slug: req.params.slug }, include: { artworks: true } }); if (!category) return res.status(404).json({ error: 'Categoría no encontrada.' }); res.json(category); } catch (error) { handlePrismaError(error, res, 'Error al obtener categoría.'); } });
-app.post('/api/categories', authenticateToken, requireAdmin, async (req, res) => { try { const slug = cleanString(req.body.slug, 80).toLowerCase().replace(/[^a-z0-9-]/g, '-'); const name = cleanString(req.body.name, 120), description = cleanString(req.body.description, 5000); validateRequired({ 'Nombre': name }); const category = await prisma.category.create({ data: { slug, name, description } }); res.status(201).json(category); } catch (error) { if (error.message?.includes('requerido')) return res.status(400).json({ error: error.message }); handlePrismaError(error, res, 'Error al crear categoría.'); } });
-app.put('/api/categories/:slug', authenticateToken, requireAdmin, async (req, res) => { try { const name = cleanString(req.body.name, 120), description = cleanString(req.body.description, 5000); validateRequired({ 'Nombre': name }); const category = await prisma.category.update({ where: { slug: req.params.slug }, data: { name, description } }); res.json(category); } catch (error) { if (error.message?.includes('requerido')) return res.status(400).json({ error: error.message }); handlePrismaError(error, res, 'Error al actualizar categoría.'); } });
+app.post('/api/categories', authenticateToken, requireAdmin, async (req, res) => { try { const slug = createSlug(req.body.slug); const name = cleanString(req.body.name, 120), description = cleanString(req.body.description, 5000); validateRequired({ 'Nombre': name, 'Enlace': slug }); const category = await prisma.category.create({ data: { slug, name, description } }); res.status(201).json(category); } catch (error) { if (error.message?.includes('requerido')) return res.status(400).json({ error: error.message }); handlePrismaError(error, res, 'Error al crear categoría.'); } });
+app.put('/api/categories/:slug', authenticateToken, requireAdmin, async (req, res) => { try { const name = cleanString(req.body.name, 120), description = cleanString(req.body.description, 5000), slug = createSlug(req.body.slug || req.params.slug); validateRequired({ 'Nombre': name, 'Enlace': slug }); const category = await prisma.category.update({ where: { slug: req.params.slug }, data: { slug, name, description } }); res.json(category); } catch (error) { if (error.message?.includes('requerido')) return res.status(400).json({ error: error.message }); handlePrismaError(error, res, 'Error al actualizar categoría.'); } });
 app.delete('/api/categories/:slug', authenticateToken, requireAdmin, async (req, res) => { try { await prisma.category.delete({ where: { slug: req.params.slug } }); res.json({ message: 'Categoría eliminada.' }); } catch (error) { handlePrismaError(error, res, 'Error al eliminar categoría.'); } });
 
 // ========================= ACERCA DE =========================

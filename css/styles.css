@@ -1972,6 +1972,14 @@ header .room-tag{
   color:var(--wall);
 }
 
+#category-slug-help{
+  display:block;
+  margin-top:7px;
+  color:var(--stone);
+  font-size:11px;
+  line-height:1.4;
+}
+
 /* ========== Estilos para Vista de Mis Compras ========== */
 
 .loading-message,

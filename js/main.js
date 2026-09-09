@@ -245,7 +245,11 @@ async function loadApiData(force = false){
 // Renderizar el panel de categorías del nav desde categoriesData
 function renderCategoriesPanel(){
   const list = document.getElementById('categories-panel-list');
-  if(!list || !categoriesData.length) return;
+  if(!list) return;
+  if(!categoriesData.length){
+    list.innerHTML = '<li class="panel-empty-state">Próximamente nuevas categorías.</li>';
+    return;
+  }
   list.innerHTML = categoriesData.map(cat =>
     `<li><a href="#/categoria/${cat.slug}">${sanitizeText(cat.name)}</a></li>`
   ).join('');
@@ -1732,6 +1736,7 @@ async function loadCategoriesList(){
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:12px; border-top:1px solid var(--line);">
           <span class="billing-chip" style="margin:0;">${(cat.artworks || []).length} obras vinculadas</span>
           <div class="admin-list-item-actions">
+            <button onclick="openCategorySection('${cat.slug}')" class="small-btn">Ver sección</button>
             <button onclick="editCategory('${cat.slug}')" class="small-btn">Editar</button>
             <button onclick="deleteCategory('${cat.slug}')" class="small-btn danger">Eliminar</button>
           </div>
@@ -2844,6 +2849,8 @@ function openAddCategoryModal() {
   document.getElementById('category-modal-title').textContent = 'Agregar Nueva Categoría';
   document.getElementById('category-slug').value = '';
   document.getElementById('add-category-form').reset();
+  document.getElementById('category-public-slug').value = '';
+  document.getElementById('category-public-slug').dataset.manuallyEdited = '';
   
   modal.style.display = 'flex';
   
@@ -2884,6 +2891,8 @@ window.editCategory = async function(categorySlug) {
     document.getElementById('category-modal-title').textContent = 'Editar Categoría';
     document.getElementById('category-slug').value = category.slug;
     document.getElementById('category-name').value = category.name;
+    document.getElementById('category-public-slug').value = category.slug;
+    document.getElementById('category-public-slug').dataset.manuallyEdited = 'true';
     document.getElementById('category-description').value = category.description || '';
     
     const modal = document.getElementById('add-category-modal');
@@ -2898,6 +2907,20 @@ window.editCategory = async function(categorySlug) {
     alert('Error al cargar la categoría');
   }
 };
+
+window.openCategorySection = function(categorySlug) {
+  window.location.hash = `#/categoria/${categorySlug}`;
+};
+
+function categorySlugify(value) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 // Función para eliminar categoría
 window.deleteCategory = async function(categorySlug) {
@@ -2929,6 +2952,16 @@ window.deleteCategory = async function(categorySlug) {
 // Event listeners para botones de agregar categoría
 document.getElementById('add-category-btn').addEventListener('click', openAddCategoryModal);
 document.getElementById('cancel-add-category').addEventListener('click', closeAddCategoryModal);
+document.getElementById('category-name').addEventListener('input', (event) => {
+  const originalSlug = document.getElementById('category-slug').value;
+  const slugField = document.getElementById('category-public-slug');
+  if (!originalSlug && !slugField.dataset.manuallyEdited) {
+    slugField.value = categorySlugify(event.target.value);
+  }
+});
+document.getElementById('category-public-slug').addEventListener('input', (event) => {
+  event.target.dataset.manuallyEdited = event.target.value ? 'true' : '';
+});
 
 // Event listener para formulario de agregar categoría
 document.getElementById('add-category-form').addEventListener('submit', async (e) => {
@@ -2937,21 +2970,19 @@ document.getElementById('add-category-form').addEventListener('submit', async (e
   const formData = new FormData(e.target);
   const data = Object.fromEntries(formData.entries());
   const categorySlug = document.getElementById('category-slug').value;
+  const requestedSlug = categorySlugify(data.slug || data.name);
   
-  // Si no hay slug, es una creación nueva
+  // Si no hay slug anterior, se está creando una categoría nueva.
   const isEdit = !!categorySlug;
   const url = isEdit ? `/api/categories/${categorySlug}` : '/api/categories';
   const method = isEdit ? 'PUT' : 'POST';
   
-  // Si es creación, generar slug desde el nombre
-  if (!isEdit) {
-    data.slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  // Guardar siempre el enlace normalizado; al editar también puede cambiarse.
+  if (!requestedSlug) {
+    alert('Indica un nombre o un enlace válido para la categoría.');
+    return;
   }
-  
-  // Si es edición, no enviar el slug en el body
-  if (isEdit) {
-    delete data.slug;
-  }
+  data.slug = requestedSlug;
   
   try {
     const response = await fetch(url, {
