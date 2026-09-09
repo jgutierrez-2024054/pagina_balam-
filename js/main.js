@@ -1,213 +1,13 @@
 /* ============================================================
-<<<<<<< HEAD
    DATOS
    El contenido de la galería se carga exclusivamente desde la API.
    El seed inicial conserva los datos históricos del proyecto.
    ============================================================ */
 
-=======
-   DATOS DE LA GALERÍA — edítalos libremente.
-   Cada "sala" agrupa obras que aparecerán una junto a otra.
-   Cuando tengas las fotos reales de tu galería, reemplaza el
-   campo `image` con la URL/ruta de la foto de esa obra.
-   Si `image` queda vacío (""), se muestra un lienzo abstracto
-   de relleno generado con degradados (para maquetar sin fotos).
-
-   NOTA sobre fotos con VARIAS obras en un mismo encuadre:
-   si subes una sola foto de una pared con varios cuadros,
-   lo ideal es recortar cada cuadro en una imagen individual
-   (más simple y con mejor calidad al hacer zoom). Si prefieres
-   usar la foto completa con puntos clicables sobre cada cuadro,
-   dímelo y adapto esta sección a un modo de "hotspots" por
-   coordenadas (x%, y%) sobre una sola imagen.
-   ============================================================ */
-
-// Datos de salas con fotos reales + hotspots
-const PHOTO_SCENES = [
-  {
-    name: "Sala I",
-    theme: "Instalación textil",
-    image: "images/sala-trapos.jpeg",
-    hotspots: [
-      {
-        id: "photo-0-0",
-        left:11.5, top:35, width:9, height:13,
-        title:"Vestigio Morado", artist:"Balam", year:"2025",
-        medium:"Tela teñida intervenida", dims:"40 × 20 cm", price:"Q3,500",
-        desc:"Prenda teñida a mano, suspendida como piel descartada. Parte de una serie sobre objetos cotidianos convertidos en reliquia."
-      },
-      {
-        id: "photo-0-1",
-        left:31, top:25, width:13, height:27,
-        title:"Vestigio Rojo", artist:"Balam", year:"2025",
-        medium:"Tela teñida intervenida", dims:"55 × 25 cm", price:"Q3,750",
-        desc:"El rojo satura la tela hasta el punto de tensión. Un hilo desciende desde la prenda hasta un ovillo en el piso, conectando ambas piezas."
-      },
-      {
-        id: "photo-0-2",
-        left:52, top:34, width:14, height:41,
-        title:"Vestigio Verde", artist:"Balam", year:"2025",
-        medium:"Tela teñida intervenida", dims:"60 × 30 cm", price:"Q3,750",
-        desc:"La prenda más larga de la serie, casi rozando el piso. Su hilo conductor continúa hasta la mesa de ovillos de la sala contigua."
-      }
-    ]
-  },
-  {
-    name: "Sala II",
-    theme: "La esfera",
-    image: "images/sala-esfera.jpeg",
-    hotspots: [
-      {
-        id: "photo-1-0",
-        left:30, top:26, width:35, height:25,
-        title:"Origen (Esfera de hilo)", artist:"Balam", year:"2025",
-        medium:"Instalación — hilo tejido sobre estructura esférica", dims:"70 cm diámetro", price:"Q25,000",
-        desc:"Pieza central de la instalación: kilómetros de hilo de colores tejidos a mano hasta formar una esfera densa. Los hilos sobrantes descienden hasta ovillos individuales dispuestos bajo la mesa."
-      }
-    ]
-  },
-  {
-    name: "Sala III",
-    theme: "Sala de tortillas",
-    image: "images/sala de tortillas.jpeg",
-    hotspots: [
-      {
-        id: "photo-2-0",
-        left:25, top:30, width:20, height:30,
-        title:"Tortilla y Luna A", artist:"Balam", year:"2025",
-        medium:"Grafito sobre papel acuarela", dims:"12 × 9 cm", price:"Q1,400",
-        desc:"Estudio en miniatura de la serie lunar. El grafito construye la superficie de la tortilla como si fuese un cuerpo celeste."
-      },
-      {
-        id: "photo-2-1",
-        left:55, top:35, width:18, height:25,
-        title:"Tortilla y Luna B", artist:"Balam", year:"2025",
-        medium:"Grafito sobre papel acuarela", dims:"17 × 12 cm", price:"Q1,700",
-        desc:"Segunda variación de la serie: una tortilla retratada con el detalle y la reverencia de un mapa lunar."
-      }
-    ]
-  }
-];
-
-// Datos de salas de relleno (sin foto real, usan gradientes)
-const ROOMS = [
-  {
-    name: "Sala III",
-    theme: "El deshielo",
-    artworks: [
-      {
-        id: "room-03-0",
-        title: "Marea Interior", artist: "Lucía Bravo", year: "2023",
-        medium: "Óleo sobre lienzo", dims: "90 × 120 cm", price:"Q14,500",
-        desc: "Capas de azul profundo y blanco roto construyen un oleaje detenido a mitad de movimiento. Bravo trabaja el óleo casi como sedimento, dejando que cada pasada seque antes de la siguiente.",
-        palette: ["#1e3a5f","#3d6b8a","#eae3d3"], image: ""
-      },
-      {
-        id: "room-03-1",
-        title: "Fragmento Solar", artist: "Emiliano Ríos", year: "2022",
-        medium: "Acrílico y hoja de oro sobre madera", dims: "70 × 70 cm", price:"Q18,800",
-        desc: "Un disco de pan de oro se fractura sobre un fondo terracota. Ríos explora la luz como material físico, no como efecto de color.",
-        palette: ["#8a3b2b","#c9a227","#2b1a12"], image: ""
-      }
-    ]
-  },
-  {
-    name: "Sala IV",
-    theme: "Materia y silencio",
-    artworks: [
-      {
-        id: "room-04-0",
-        title: "Silencio Ocre", artist: "Paula Ibarra", year: "2024",
-        medium: "Técnica mixta sobre lienzo", dims: "100 × 100 cm", price:"Q24,200",
-        desc: "Arena, pigmento y cera se acumulan en franjas horizontales. La pieza más grande de Ibarra hasta la fecha, pensada para observarse de cerca y de lejos.",
-        palette: ["#6b5030","#c9b183","#241a10"], image: ""
-      },
-      {
-        id: "room-04-1",
-        title: "Cuerpo de Agua", artist: "Diego Salas", year: "2021",
-        medium: "Óleo sobre lienzo", dims: "80 × 100 cm", price:"Q23,000",
-        desc: "Un desnudo disuelto en reflejos verdosos, entre el retrato y el paisaje. Salas retoma la tradición figurativa desde una superficie casi líquida.",
-        palette: ["#2f4a3d","#5c8570","#101a15"], image: ""
-      }
-    ]
-  },
-  {
-    name: "Sala V",
-    theme: "Nocturnos",
-    artworks: [
-      {
-        id: "room-05-0",
-        title: "Nocturno No. 4", artist: "Renata Kahl", year: "2023",
-        medium: "Carboncillo y pastel sobre papel", dims: "60 × 90 cm", price:"Q9,400",
-        desc: "Cuarta entrega de una serie sobre insomnio urbano. El carboncillo se difumina hasta perder el contorno de la figura.",
-        palette: ["#2a2a33","#6b6b7a","#0e0e12"], image: ""
-      },
-      {
-        id: "room-05-1",
-        title: "Vestigio", artist: "Mateo Duarte", year: "2024",
-        medium: "Escultura en bronce", dims: "45 × 30 × 30 cm", price:"Q35,000",
-        desc: "Pieza única, fundida en bronce a la cera perdida. Duarte parte de restos orgánicos reales para construir su molde.",
-        palette: ["#7a5a2e","#c9a227","#241d10"], image: ""
-      }
-    ]
-  }
-];
-
-// Métodos de pago (reutilizables para todas las obras)
-const PAYMENT_METHODS = [
-  { id: "card", label: "Tarjeta de crédito o débito", icon: "💳" },
-  { id: "transfer", label: "Transferencia bancaria", icon: "🏦" },
-  { id: "cash", label: "Pago contra entrega", icon: "📦" }
-];
-
-// Datos de libros/publicaciones
-const BOOKS = [
-  {
-    id: "book-0",
-    title: "Magenta E Volumen Uno",
-    author: "BALAM",
-    year: "2025",
-    desc: "Catálogo completo de la serie de instalaciones textiles 'Vestigios', con fotografías de las obras y ensayos críticos sobre la memoria y el despojo en el arte contemporáneo guatemalteco.",
-    price:"Q2,750",
-    palette: ["#2a3d2e", "#c9a227", "#ede4dd"]
-  },
-  {
-    id: "book-1",
-    title: "Magenta E Volumen Dos",
-    author: "BALAM",
-    year: "2024",
-    desc: "Monografía sobre la instalación central de la galería, documentando el proceso de creación de la esfera de hilo y su significado simbólico en el contexto del arte latinoamericano.",
-    price:"Q2,200",
-    palette: ["#1a2a3a", "#c9a227", "#ede4dd"]
-  },
-  {
-    id: "book-2",
-    title: "Magenta E Volumen Tres",
-    author: "BALAM",
-    year: "2025",
-    desc: "Libro de artista que explora la serie de dibujos que eleva lo cotidiano a categoría celestial, con reproducciones de alta calidad de los estudios lunares.",
-    price:"Q1,400",
-    palette: ["#3d2a2a", "#c9a227", "#ede4dd"]
-  }
-];
-
-// Descripciones placeholder para las 5 categorías nuevas
-// NOTA: Estas descripciones son temporales. Cuando esté listo el contenido real,
-// reemplazar estas descripciones con el contenido de las obras de cada categoría.
-const CATEGORY_PLACEHOLDERS = {
-  pintura: "Próximamente encontrarás aquí piezas en óleo, acrílico y técnica mixta de nuestros artistas.",
-  dibujo: "Próximamente encontrarás aquí obras en grafito, carboncillo, pastel y otras técnicas de dibujo.",
-  "tinta-china": "Próximamente encontrarás aquí obras tradicionales y contemporáneas en tinta china.",
-  caricatura: "Próximamente encontrarás aquí obras de caricatura y sátira visual de nuestros artistas.",
-  fotografia: "Próximamente encontrarás aquí fotografía artística, documental y experimental."
-};
-
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 /* ============================================================
    SISTEMA DE ROUTING Y NAVEGACIÓN
    ============================================================ */
 
-<<<<<<< HEAD
 // Variables de módulo para datos de la API
 let roomsData = [];
 let booksData = [];
@@ -505,18 +305,12 @@ function requestConfirmation(message, confirmLabel = 'Sí, eliminar') {
 
 // Sustituye las alertas nativas por avisos discretos y coherentes con la interfaz.
 window.alert = (message) => showToast(message);
-=======
-// Estado de la aplicación
-let currentRoomIndex = null;
-let currentHotspotData = null;
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 
 // Detectar si es dispositivo móvil
 const isMobile = () => {
   return window.innerWidth <= 760 || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 };
 
-<<<<<<< HEAD
 // Función para sanitizar texto y prevenir XSS
 function sanitizeText(text){
   if(typeof text !== 'string') return text;
@@ -597,15 +391,12 @@ function getImageRect(imgElement, containerElement){
   return { width: imageWidth, height: imageHeight, offsetX, offsetY };
 }
 
-=======
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 // Elementos DOM
 const views = {
   landing: document.getElementById('view-landing'),
   selector: document.getElementById('view-selector'),
   room: document.getElementById('view-room'),
   purchase: document.getElementById('view-purchase'),
-<<<<<<< HEAD
   adminLogin: document.getElementById('view-admin-login'),
   forgotPassword: document.getElementById('view-forgot-password'),
   resetPassword: document.getElementById('view-reset-password'),
@@ -616,11 +407,6 @@ const views = {
   category: document.getElementById('view-category'),
   clientLogin: document.getElementById('view-client-login'),
   myOrders: document.getElementById('view-my-orders')
-=======
-  books: document.getElementById('view-books'),
-  about: document.getElementById('view-about'),
-  category: document.getElementById('view-category')
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 };
 
 const elements = {
@@ -630,10 +416,7 @@ const elements = {
   roomsGrid: document.getElementById('rooms-grid'),
   booksGrid: document.getElementById('books-grid'),
   roomImage: document.getElementById('room-image'),
-<<<<<<< HEAD
   roomPhotoFrame: document.getElementById('room-photo-frame'),
-=======
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   roomHotspots: document.getElementById('room-hotspots'),
   currentRoomName: document.getElementById('current-room-name'),
   backToSelector: document.getElementById('back-to-selector'),
@@ -646,7 +429,6 @@ const elements = {
   categoryTitle: document.getElementById('category-title'),
   categoryDescText: document.getElementById('category-desc-text'),
   categoryRoomTag: document.getElementById('category-room-tag'),
-<<<<<<< HEAD
   categoryBackBtn: document.getElementById('category-back-btn'),
   // Elementos de administración
   adminLoginForm: document.getElementById('admin-login-form'),
@@ -684,9 +466,6 @@ const elements = {
   ordersEmpty: document.getElementById('orders-empty'),
   ordersListContainer: document.getElementById('orders-list-container'),
   goToSelectorFromOrders: document.getElementById('go-to-selector-from-orders')
-=======
-  categoryBackBtn: document.getElementById('category-back-btn')
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 };
 
 // Función para generar gradiente desde paleta
@@ -696,7 +475,6 @@ function gradientFor(p){
           linear-gradient(160deg, ${p[2]}, ${p[0]})`;
 }
 
-<<<<<<< HEAD
 // Obtener todas las salas combinadas (desde datos de API)
 function getRoomDisplayName(room){
   if(/^Sala\s+/i.test(room.name || '')) return `Sala ${room.roomNumber}`;
@@ -718,16 +496,10 @@ function getAllRooms(){
       left: art.hotspotLeft, top: art.hotspotTop, width: art.hotspotWidth, height: art.hotspotHeight
     })) : null
   }));
-=======
-// Obtener todas las salas combinadas (PHOTO_SCENES + ROOMS)
-function getAllRooms(){
-  return [...PHOTO_SCENES, ...ROOMS];
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 }
 
 // Renderizar grid de libros
 function renderBooks(){
-<<<<<<< HEAD
   // Mostrar estado de carga
   elements.booksGrid.innerHTML = '<div class="loading-container"><div class="loading-spinner"></div><div class="loading-text">Cargando libros...</div></div>';
   
@@ -778,42 +550,6 @@ function renderBooks(){
     console.error('Error al cargar libros:', error);
     elements.booksGrid.innerHTML = '<div class="empty-message"><h2>Error al cargar libros</h2><p>Por favor intenta nuevamente más tarde.</p></div>';
   });
-=======
-  elements.booksGrid.innerHTML = '';
-  
-  BOOKS.forEach((book, index) => {
-    const card = document.createElement('div');
-    card.className = 'book-card';
-    
-    const cover = document.createElement('div');
-    cover.className = 'book-cover';
-    cover.style.backgroundImage = gradientFor(book.palette);
-    
-    const info = document.createElement('div');
-    info.className = 'book-info';
-    info.innerHTML = `
-      <h3>${book.title}</h3>
-      <div class="author">${book.author}</div>
-      <div class="year">${book.year}</div>
-      <div class="price">${book.price}</div>
-    `;
-    
-    card.appendChild(cover);
-    card.appendChild(info);
-    
-    card.addEventListener('click', () => {
-      currentHotspotData = {...book, isBook: true};
-      navigateToPurchase(book);
-    });
-    
-    elements.booksGrid.appendChild(card);
-  });
-  
-  // Aplicar grid layout
-  elements.booksGrid.style.display = 'grid';
-  elements.booksGrid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(280px, 1fr))';
-  elements.booksGrid.style.gap = '30px';
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 }
 
 /* ============================================================
@@ -821,7 +557,6 @@ function renderBooks(){
    ============================================================ */
 
 function renderRoomSelector(){
-<<<<<<< HEAD
   // Mostrar estado de carga
   elements.roomsGrid.innerHTML = '<div class="loading-container"><div class="loading-spinner"></div><div class="loading-text">Cargando salas...</div></div>';
   
@@ -859,36 +594,6 @@ function renderRoomSelector(){
   }).catch(error => {
     console.error('Error al cargar salas:', error);
     elements.roomsGrid.innerHTML = '<div class="empty-message"><h2>Error al cargar salas</h2><p>Por favor intenta nuevamente más tarde.</p></div>';
-=======
-  const allRooms = getAllRooms();
-  elements.roomsGrid.innerHTML = '';
-  
-  allRooms.forEach((room, index) => {
-    const card = document.createElement('div');
-    card.className = 'room-card';
-    card.onclick = () => navigateToRoom(index);
-    
-    // Determinar miniatura (imagen real o gradiente)
-    let thumbnailStyle = '';
-    if(room.image){
-      thumbnailStyle = `background-image: url('${room.image}');`;
-    } else if(room.artworks && room.artworks.length > 0){
-      thumbnailStyle = `background-image: ${gradientFor(room.artworks[0].palette)};`;
-    } else {
-      thumbnailStyle = `background: linear-gradient(160deg, var(--wall-2), var(--wall-3));`;
-    }
-    
-    card.innerHTML = `
-      <div class="thumbnail" style="${thumbnailStyle}"></div>
-      <div class="card-body">
-        <span class="card-num">${String(index + 1).padStart(2, '0')}</span>
-        <h3 class="card-title">${room.name}</h3>
-        <span class="card-theme">${room.theme}</span>
-      </div>
-    `;
-    
-    elements.roomsGrid.appendChild(card);
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   });
 }
 
@@ -902,7 +607,6 @@ function navigateToRoom(index){
   const room = allRooms[index];
 
   // Actualizar nombre de sala
-<<<<<<< HEAD
   elements.currentRoomName.textContent = getRoomDisplayName(room);
 
   // Actualizar imagen o lienzo de gradiente para salas sin fotografía.
@@ -916,12 +620,6 @@ function navigateToRoom(index){
     elements.roomImage.style.display = 'none';
     elements.roomPhotoFrame.style.background = gradientFor(['#1e3a5f','#3d6b8a','#eae4d3']);
   }
-=======
-  elements.currentRoomName.textContent = room.name;
-
-  // Actualizar imagen
-  elements.roomImage.style.backgroundImage = `url('${room.image}')`;
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 
   // Limpiar hotspots anteriores
   elements.roomHotspots.innerHTML = '';
@@ -934,7 +632,6 @@ function navigateToRoom(index){
     elements.roomHotspots.appendChild(mobileHint);
   }
 
-<<<<<<< HEAD
   // Función para posicionar hotspots basado en el área real de la imagen
   function positionHotspots(){
     const imgRect = safeRoomImage && elements.roomImage.naturalWidth > 0 ? getImageRect(elements.roomImage, elements.roomPhotoFrame) : { width: elements.roomPhotoFrame.clientWidth, height: elements.roomPhotoFrame.clientHeight, offsetX: 0, offsetY: 0 };
@@ -962,41 +659,25 @@ function navigateToRoom(index){
     });
   }
 
-=======
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   // Si tiene hotspots (PHOTO_SCENES), crear botones
   if(room.hotspots){
     room.hotspots.forEach((h, i) => {
       const btn = document.createElement('button');
       btn.className = 'hotspot';
-<<<<<<< HEAD
       // Guardar coordenadas originales en porcentajes
       btn.dataset.x = h.left;
       btn.dataset.y = h.top;
       btn.dataset.w = h.width;
       btn.dataset.h = h.height;
-=======
-      btn.style.left = h.x + '%';
-      btn.style.top = h.y + '%';
-      btn.style.width = h.w + '%';
-      btn.style.height = h.h + '%';
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
       btn.setAttribute('aria-label', `${h.title} — ${h.price}`);
 
       btn.innerHTML = `
         <span class="dot"></span>
         <span class="tip">
-<<<<<<< HEAD
           <span class="tip-title">${sanitizeText(h.title)}</span>
           <span class="tip-artist">${sanitizeText(h.artist)}, ${sanitizeText(h.year)}</span>
           <span class="tip-desc">${sanitizeText(h.desc)}</span>
           <span class="tip-price">${sanitizeText(h.price)}</span>
-=======
-          <span class="tip-title">${h.title}</span>
-          <span class="tip-artist">${h.artist}, ${h.year}</span>
-          <span class="tip-desc">${h.desc}</span>
-          <span class="tip-price">${h.price}</span>
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
         </span>
       `;
 
@@ -1027,7 +708,6 @@ function navigateToRoom(index){
 
       elements.roomHotspots.appendChild(btn);
     });
-<<<<<<< HEAD
 
     // Posicionar hotspots después de que la imagen cargue
     elements.roomImage.onload = () => {
@@ -1038,13 +718,10 @@ function navigateToRoom(index){
     if(elements.roomImage.complete){
       positionHotspots();
     }
-=======
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   }
 
   // Si es sala de relleno (ROOMS), crear hotspots para cada artwork
   if(room.artworks && !room.hotspots){
-<<<<<<< HEAD
     // Si una obra no tiene coordenadas, distribuirla automáticamente en una cuadrícula.
     const columns = Math.max(1, Math.ceil(Math.sqrt(room.artworks.length)));
     const cell = 100 / columns;
@@ -1060,33 +737,16 @@ function navigateToRoom(index){
       btn.dataset.y = art.hotspotTop ?? pos.y;
       btn.dataset.w = art.hotspotWidth ?? Math.min(cell * 0.7, 28);
       btn.dataset.h = art.hotspotHeight ?? Math.min(cell * 0.7, 28);
-=======
-    room.artworks.forEach((art, ai) => {
-      const btn = document.createElement('button');
-      btn.className = 'hotspot';
-      // Posicionar en el centro para salas de relleno
-      btn.style.left = '40%';
-      btn.style.top = '40%';
-      btn.style.width = '20%';
-      btn.style.height = '20%';
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
       btn.setAttribute('aria-label', `${art.title} — ${art.price}`);
       btn.dataset.artworkIndex = ai;
 
       btn.innerHTML = `
         <span class="dot"></span>
         <span class="tip">
-<<<<<<< HEAD
           <span class="tip-title">${sanitizeText(art.title)}</span>
           <span class="tip-artist">${sanitizeText(art.artist)}, ${sanitizeText(art.year)}</span>
           <span class="tip-desc">${sanitizeText(art.desc)}</span>
           <span class="tip-price">${sanitizeText(art.price)}</span>
-=======
-          <span class="tip-title">${art.title}</span>
-          <span class="tip-artist">${art.artist}, ${art.year}</span>
-          <span class="tip-desc">${art.desc}</span>
-          <span class="tip-price">${art.price}</span>
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
         </span>
       `;
 
@@ -1117,7 +777,6 @@ function navigateToRoom(index){
 
       elements.roomHotspots.appendChild(btn);
     });
-<<<<<<< HEAD
 
     // Posicionar hotspots después de que la imagen cargue
     elements.roomImage.onload = () => {
@@ -1128,13 +787,10 @@ function navigateToRoom(index){
     if(elements.roomImage.complete){
       positionHotspots();
     }
-=======
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   }
 
   // Cambiar vista con animación
   switchView('room', index);
-<<<<<<< HEAD
 
   // Remover listener de resize anterior si existe
   if(currentResizeHandler){
@@ -1144,15 +800,12 @@ function navigateToRoom(index){
   // Guardar referencia al nuevo handler y agregarlo
   currentResizeHandler = positionHotspots;
   window.addEventListener('resize', currentResizeHandler);
-=======
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 }
 
 /* ============================================================
    VISTA 6: Página de Categoría
    ============================================================ */
 
-<<<<<<< HEAD
 async function navigateToCategory(categoryId){
   elements.categoryDescText.textContent = 'Cargando...';
   try {
@@ -1186,32 +839,6 @@ async function navigateToCategory(categoryId){
     elements.categoryDescText.textContent = 'No fue posible cargar esta categoría.';
     switchView('category');
   }
-=======
-function navigateToCategory(categoryId){
-  // Verificar si la categoría existe en los placeholders
-  if(!CATEGORY_PLACEHOLDERS[categoryId]){
-    // Si no existe, redirigir a colecciones
-    switchView('selector');
-    return;
-  }
-
-  // Obtener el nombre formateado de la categoría
-  const categoryNames = {
-    pintura: 'Pintura',
-    dibujo: 'Dibujo',
-    'tinta-china': 'Tinta China',
-    caricatura: 'Caricatura',
-    fotografia: 'Fotografía'
-  };
-
-  // Llenar datos de la categoría
-  elements.categoryTitle.textContent = categoryNames[categoryId] || categoryId;
-  elements.categoryDescText.textContent = CATEGORY_PLACEHOLDERS[categoryId];
-  elements.categoryRoomTag.textContent = categoryNames[categoryId] || categoryId;
-
-  // Cambiar vista
-  switchView('category');
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 }
 
 /* ============================================================
@@ -1219,7 +846,6 @@ function navigateToCategory(categoryId){
    ============================================================ */
 
 function navigateToPurchase(data){
-<<<<<<< HEAD
   // Verificar si hay sesión iniciada
   authToken = localStorage.getItem('authToken');
   currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
@@ -1234,8 +860,6 @@ function navigateToPurchase(data){
     return;
   }
   
-=======
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   // Determinar si es libro o obra
   const isBook = data.isBook || false;
   
@@ -1243,11 +867,7 @@ function navigateToPurchase(data){
   document.getElementById('purchase-eyebrow').textContent = isBook 
     ? 'Publicación'
     : (data.roomId !== undefined 
-<<<<<<< HEAD
       ? `Sala ${(getAllRooms()[data.roomId]?.roomNumber || (data.roomId + 1))} · Obra ${data.id}` 
-=======
-      ? `Sala ${data.roomId + 1} · Obra ${data.id}` 
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
       : `${data.artist} · ${data.year}`);
   
   document.getElementById('purchase-title').textContent = data.title;
@@ -1257,26 +877,16 @@ function navigateToPurchase(data){
   document.getElementById('purchase-year').textContent = data.year;
   document.getElementById('purchase-medium').textContent = isBook ? 'Libro/Catálogo' : data.medium;
   document.getElementById('purchase-dims').textContent = isBook ? 'Varía según edición' : data.dims;
-<<<<<<< HEAD
   document.getElementById('purchase-avail').textContent = data.status === 'SOLD' ? 'Vendida' : data.status === 'RESERVED' ? 'Reservada' : 'Disponible';
   document.getElementById('purchase-desc').textContent = data.desc || data.description || '';
   if(data.status === 'SOLD' || data.status === 'RESERVED'){ elements.confirmPurchase.disabled = true; elements.confirmPurchase.textContent = data.status === 'SOLD' ? 'Obra vendida' : 'Obra reservada'; } else { elements.confirmPurchase.disabled = false; elements.confirmPurchase.textContent = 'Confirmar interés'; }
-=======
-  document.getElementById('purchase-avail').textContent = 'Disponible';
-  document.getElementById('purchase-desc').textContent = data.desc;
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   document.getElementById('purchase-price').textContent = data.price;
   
   // Configurar visual
   const canvas = document.getElementById('purchase-canvas');
-<<<<<<< HEAD
   const safeImage = sanitizeImageUrl(data.image || data.coverUrl);
   if(safeImage){
     canvas.style.backgroundImage = `url("${safeImage}")`;
-=======
-  if(data.image){
-    canvas.style.backgroundImage = `url('${data.image}')`;
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   } else if(data.palette){
     canvas.style.backgroundImage = gradientFor(data.palette);
   } else {
@@ -1295,21 +905,13 @@ function navigateToPurchase(data){
 function renderPaymentOptions(){
   elements.paymentOptions.innerHTML = '';
   
-<<<<<<< HEAD
   const methods = paymentMethodsData.length ? paymentMethodsData : [];
   methods.forEach(method => {
-=======
-  PAYMENT_METHODS.forEach(method => {
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
     const option = document.createElement('div');
     option.className = 'payment-option';
     option.innerHTML = `
       <input type="radio" name="payment" id="payment-${method.id}" value="${method.id}">
-<<<<<<< HEAD
       <label for="payment-${method.id}">${sanitizeText(method.icon)} ${sanitizeText(method.label)}</label>
-=======
-      <label for="payment-${method.id}">${method.icon} ${method.label}</label>
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
     `;
     
     option.onclick = () => {
@@ -1322,7 +924,6 @@ function renderPaymentOptions(){
   });
 }
 
-<<<<<<< HEAD
 async function confirmPurchaseInterest(){
   // Una compra no puede completarse sin sesión, incluso al volver con el historial.
   if (!authToken || !currentUser) {
@@ -1389,19 +990,6 @@ async function confirmPurchaseInterest(){
     console.error('Error al crear pedido:', error);
     alert(error.message || 'Error al crear el pedido. Por favor intenta nuevamente.');
   }
-=======
-function confirmPurchaseInterest(){
-  const selectedPayment = document.querySelector('input[name="payment"]:checked');
-  const method = selectedPayment 
-    ? PAYMENT_METHODS.find(m => m.id === selectedPayment.value)
-    : null;
-  
-  const message = method
-    ? `¡Interés confirmado!\n\nMétodo de pago seleccionado: ${method.label}\n\nTe contactaremos pronto para completar la compra.`
-    : 'Por favor selecciona un método de pago.';
-  
-  alert(message);
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 }
 
 /* ============================================================
@@ -1409,7 +997,6 @@ function confirmPurchaseInterest(){
    ============================================================ */
 
 function switchView(viewName, roomIndex = null){
-<<<<<<< HEAD
   const isAdminView = ['adminDashboard', 'adminLogin', 'forgotPassword', 'resetPassword'].includes(viewName);
   document.body.classList.toggle('admin-mode', isAdminView);
   document.body.classList.toggle('immersive-room', viewName === 'room');
@@ -1431,20 +1018,11 @@ function switchView(viewName, roomIndex = null){
       v.style.display = 'none';
       v.style.opacity = '0';
     }
-=======
-  // Ocultar todas las vistas
-  Object.values(views).forEach(v => {
-    v.style.display = 'none';
-    v.style.opacity = '0';
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   });
   
   // Mostrar vista seleccionada con animación
   const targetView = views[viewName];
-<<<<<<< HEAD
   if(!targetView) return;
-=======
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   targetView.style.display = 'block';
   
   gsap.fromTo(targetView, 
@@ -1457,20 +1035,13 @@ function switchView(viewName, roomIndex = null){
     history.pushState(null, '', '#/');
   } else if(viewName === 'selector'){
     history.pushState(null, '', '#/selector');
-<<<<<<< HEAD
   } else if(viewName === 'adminDashboard'){
     history.pushState(null, '', '#admin-dashboard');
-=======
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   } else if(viewName === 'room' && roomIndex !== null){
     history.pushState(null, '', `#/sala/${roomIndex}`);
   } else if(viewName === 'purchase' && currentHotspotData){
     const roomId = currentHotspotData.roomId !== undefined ? currentHotspotData.roomId : currentRoomIndex;
-<<<<<<< HEAD
     const artId = currentHotspotData.id;
-=======
-    const artId = currentHotspotData.artIndex !== undefined ? currentHotspotData.artIndex : currentHotspotData.id;
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
     history.pushState(null, '', `#/obra/${roomId}/${artId}`);
   }
   
@@ -1493,7 +1064,6 @@ function handleHashChange(){
     renderBooks();
     switchView('books');
   } else if(hash === '#/nosotros'){
-<<<<<<< HEAD
     loadAboutContent();
     switchView('about');
   } else if(hash === '#admin-login'){
@@ -1521,9 +1091,6 @@ function handleHashChange(){
   } else if(hash === '#my-orders'){
     loadMyOrders();
     switchView('myOrders');
-=======
-    switchView('about');
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   } else if(hash.startsWith('#/categoria/')){
     const categoryId = hash.split('/')[2];
     navigateToCategory(categoryId);
@@ -1542,10 +1109,6 @@ function handleHashChange(){
       const room = allRooms[roomId];
 
       if(room){
-<<<<<<< HEAD
-=======
-        // Buscar la obra
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
         let artwork = null;
         if(room.hotspots){
           artwork = room.hotspots.find(h => h.id === artId);
@@ -1561,27 +1124,17 @@ function handleHashChange(){
     }
   } else if(hash.startsWith('#/libro/')){
     const bookId = hash.split('/')[2];
-<<<<<<< HEAD
     loadApiData().then(() => {
       const book = booksData.find(b => b.id === bookId);
       if(book){ currentHotspotData = {...book, isBook: true}; navigateToPurchase(currentHotspotData); }
       else switchView('books');
     }).catch(() => switchView('books'));
-=======
-    const book = BOOKS.find(b => b.id === bookId);
-
-    if(book){
-      currentHotspotData = {...book, isBook: true};
-      navigateToPurchase(book);
-    }
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   }
   
   // Actualizar estado activo en menú
   updateActiveNavLink();
 }
 
-<<<<<<< HEAD
 async function loadAboutContent(){
   try {
     const response = await fetch('/api/about');
@@ -1602,13 +1155,6 @@ function updateActiveNavLink(){
 
   // Remover clase active de todos los links
   document.querySelectorAll('.nav-main-links a').forEach(a => {
-=======
-function updateActiveNavLink(){
-  const hash = window.location.hash;
-  
-  // Remover clase active de todos los links
-  document.querySelectorAll('.nav-links a').forEach(a => {
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
     a.classList.remove('active');
   });
   
@@ -1623,11 +1169,7 @@ function updateActiveNavLink(){
   }
   
   // Agregar clase active al link correspondiente
-<<<<<<< HEAD
   const activeLink = document.querySelector(`.nav-main-links a[data-nav="${activeNav}"]`);
-=======
-  const activeLink = document.querySelector(`.nav-links a[data-nav="${activeNav}"]`);
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   if(activeLink){
     activeLink.classList.add('active');
   }
@@ -1687,11 +1229,7 @@ let isPanelOpen = false;
 
 function toggleCategoriesPanel(){
   isPanelOpen = !isPanelOpen;
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   if(isPanelOpen){
     // Abrir panel con animación GSAP
     elements.categoriesToggle.classList.add('active');
@@ -1750,7 +1288,6 @@ document.querySelectorAll('.panel-column-links a').forEach(link => {
   });
 });
 
-<<<<<<< HEAD
 // Ajustar posición de tooltips para que no se salgan de pantalla
 function adjustTooltipPosition(hotspot, tooltip){
   const hotspotRect = hotspot.getBoundingClientRect();
@@ -1798,8 +1335,6 @@ document.addEventListener('mouseover', (e) => {
   }
 });
 
-=======
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 // Navegación
 elements.startExperience.addEventListener('click', () => {
   renderRoomSelector();
@@ -1820,7 +1355,6 @@ elements.backToRoom.addEventListener('click', () => {
 // Botón volver en vista de categoría
 elements.categoryBackBtn.addEventListener('click', () => switchView('selector'));
 
-<<<<<<< HEAD
 /* ============================================================
    FUNCIONES DE ADMINISTRACIÓN
    ============================================================ */
@@ -2859,8 +2393,6 @@ function renderOrdersList(orders){
 elements.backToHomeFromOrders.addEventListener('click', () => switchView('landing'));
 elements.goToSelectorFromOrders.addEventListener('click', () => switchView('selector'));
 
-=======
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 // Modal
 elements.modalClose.addEventListener('click', closeModal);
 elements.modalBackdrop.addEventListener('click', (e) => {
@@ -2880,7 +2412,6 @@ elements.mBuyBtn.addEventListener('click', () => {
 
 elements.confirmPurchase.addEventListener('click', confirmPurchaseInterest);
 
-<<<<<<< HEAD
 // Event listener para cerrar modal de confirmación
 document.getElementById('confirmation-modal-close').addEventListener('click', () => {
   const modal = document.getElementById('confirmation-modal');
@@ -4576,8 +4107,6 @@ document.getElementById('artwork-status-filter')?.addEventListener('change', () 
   loadArtworksAdminList();
 });
 
-=======
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 // Hash routing
 window.addEventListener('hashchange', handleHashChange);
 window.addEventListener('popstate', handleHashChange);
@@ -4589,11 +4118,7 @@ window.addEventListener('popstate', handleHashChange);
 const cursor = document.getElementById('cursor');
 const isTouch = window.matchMedia('(max-width: 860px)').matches;
 
-<<<<<<< HEAD
 if(!isTouch && cursor){
-=======
-if(!isTouch){
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   const xTo = gsap.quickTo(cursor, "x", {duration: 0.35, ease: "power3"});
   const yTo = gsap.quickTo(cursor, "y", {duration: 0.35, ease: "power3"});
   
@@ -4623,15 +4148,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Inicializar vista según hash actual o ir a landing
 document.addEventListener('DOMContentLoaded', () => {
-<<<<<<< HEAD
   // Cargar sesión guardada y reflejarla en el panel de cuenta del cliente
   if(!currentUser){
     currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
   }
   if(typeof refreshClientAccount === 'function') refreshClientAccount();
 
-=======
->>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   if(window.location.hash){
     handleHashChange();
   } else {
