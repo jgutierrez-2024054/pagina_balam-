@@ -403,12 +403,18 @@ app.get('/api/admin/billing', authenticateToken, requireAdmin, async (req, res) 
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Endpoint no encontrado.' }));
 
-const server = app.listen(PORT, () => console.log(`🎨 BALAM ejecutándose en http://localhost:${PORT}`));
+// Exportar para Vercel Serverless Functions
+module.exports = app;
 
-async function shutdown(signal) {
-  console.log(`\n${signal}: cerrando BALAM...`);
-  await prisma.$disconnect();
-  server.close(() => process.exit(0));
+// Solo escuchar en puerto si no está en Vercel
+if (require.main === module) {
+  const server = app.listen(PORT, () => console.log(`🎨 BALAM ejecutándose en http://localhost:${PORT}`));
+
+  async function shutdown(signal) {
+    console.log(`\n${signal}: cerrando BALAM...`);
+    await prisma.$disconnect();
+    server.close(() => process.exit(0));
+  }
+  process.on('SIGINT', () => shutdown('SIGINT'));
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
 }
-process.on('SIGINT', () => shutdown('SIGINT'));
-process.on('SIGTERM', () => shutdown('SIGTERM'));
