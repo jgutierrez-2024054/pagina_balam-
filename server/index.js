@@ -12,7 +12,12 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 const prisma = new PrismaClient();
 const uploadsDir = path.join(__dirname, '..', 'uploads');
-fs.mkdirSync(uploadsDir, { recursive: true });
+const isServerless = Boolean(process.env.VERCEL);
+
+// Vercel ejecuta las funciones en un sistema de archivos de solo lectura.
+// La carpeta local se conserva para desarrollo, pero no debe crearse al
+// inicializar la función en producción.
+if (!isServerless) fs.mkdirSync(uploadsDir, { recursive: true });
 
 if (!process.env.JWT_SECRET) {
   console.warn('⚠️ JWT_SECRET no está definido. Configúralo antes de producción.');
@@ -139,6 +144,9 @@ app.post('/api/auth/reset-password', async (req, res) => {
 // ========================= UPLOADS =========================
 app.post('/api/uploads/image', authenticateToken, requireAdmin, async (req, res) => {
   try {
+    if (isServerless) {
+      return res.status(501).json({ error: 'La carga de imágenes aún no está configurada para producción.' });
+    }
     const dataUrl = cleanString(req.body.dataUrl, 8 * 1024 * 1024);
     const originalName = cleanString(req.body.fileName, 120);
     const match = dataUrl.match(/^data:(image\/(?:jpeg|png|webp|gif));base64,([A-Za-z0-9+/=]+)$/);
