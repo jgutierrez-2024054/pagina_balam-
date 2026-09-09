@@ -110,6 +110,7 @@ function toggleClientAccountPanel(force){
     clientAccountOpen = false;
     if(toggle) toggle.classList.remove('active');
   }
+  if(toggle) toggle.setAttribute('aria-expanded', String(shouldOpen));
 }
 
 function closeClientAccountPanel(){
@@ -180,6 +181,13 @@ document.addEventListener('click', function clientAccountOutside(e){
     let el = e.target;
     while(el && el.nodeType !== 1){ el = el.parentElement; }
     if(!el) return;
+    if(el.closest('#client-account-logout')){
+      e.preventDefault();
+      e.stopPropagation();
+      closeClientAccountPanel();
+      clientLogout();
+      return;
+    }
     if(!el.closest('#client-account-wrap') && !el.closest('#client-account-panel')){
       closeClientAccountPanel();
       return;

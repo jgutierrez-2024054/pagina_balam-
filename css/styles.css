@@ -2617,7 +2617,16 @@ header .room-tag{
   border:1px solid var(--line); border-radius:99px; font-family:'Space Grotesk',sans-serif;
   font-size:11px !important; letter-spacing:.02em; padding:7px 11px !important; transition:.2s ease;
 }
+.nav-account-link{
+  background:rgba(36,51,40,.96);
+  border-color:rgba(201,162,39,.56);
+  color:var(--ivory) !important;
+  font-size:12px !important;
+  font-weight:600;
+  min-height:34px;
+}
 .nav-account-link:hover{ border-color:var(--brass); color:var(--brass-soft) !important; }
+.nav-account-link.active{ background:rgba(201,162,39,.16); border-color:var(--brass); color:var(--brass-soft) !important; }
 .nav-admin-link{ background:var(--brass); border-color:var(--brass); color:var(--wall) !important; }
 .nav-admin-link:hover{ background:var(--brass-soft); }
 
@@ -2628,9 +2637,10 @@ header .room-tag{
 #client-account-toggle{
   display:inline-flex;
   align-items:center;
-  gap:0;
+  gap:4px;
   cursor:pointer;
-  background:none;
+  background:rgba(36,51,40,.96);
+  color:var(--ivory);
 }
 #client-account-toggle .chevron{
   font-size:10px;
