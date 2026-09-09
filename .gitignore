@@ -20,6 +20,7 @@ npm-debug.log*
 # Archivos temporales
 *.tmp
 *.temp
+<<<<<<< HEAD
 
 # Variables de entorno
 .env
@@ -30,3 +31,5 @@ npm-debug.log*
 # Archivos subidos en producción/local
 /uploads/*
 !/uploads/.gitkeep
+=======
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f

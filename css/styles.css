@@ -481,6 +481,7 @@ header .room-tag{
   text-transform:uppercase;
 }
 
+<<<<<<< HEAD
 /* Header específico para sala */
 .room-header{
   background:rgba(20,26,22,0.8);
@@ -497,6 +498,8 @@ header .room-tag{
 .immersive-room .room-header{ top:0; z-index:1100; }
 .immersive-room #room-viewport{ height:100vh; }
 
+=======
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 /* Botones de navegación */
 .nav-btn{
   pointer-events:auto;
@@ -538,7 +541,11 @@ header .room-tag{
   margin:0 auto;
   padding:60px 40px 100px;
   display:grid;
+<<<<<<< HEAD
   grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));
+=======
+  grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   gap:30px;
 }
 @media (max-width: 760px){
@@ -562,7 +569,11 @@ header .room-tag{
 }
 .room-card .thumbnail{
   width:100%;
+<<<<<<< HEAD
   aspect-ratio:4/3;
+=======
+  aspect-ratio:3/4;
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   background-size:cover;
   background-position:center;
   position:relative;
@@ -623,13 +634,19 @@ header .room-tag{
   display:flex;
   align-items:center;
   justify-content:center;
+<<<<<<< HEAD
   overflow:hidden;
+=======
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 }
 #room-photo-frame img{
   width:100%;
   height:100%;
   object-fit:contain;
+<<<<<<< HEAD
   object-position:center;
+=======
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   display:block;
 }
 
@@ -888,6 +905,7 @@ header .room-tag{
 
 .categories-panel.open{
   height:auto;
+<<<<<<< HEAD
   max-height:calc(100vh - 70px);
   overflow-y:auto;
 }
@@ -898,21 +916,41 @@ header .room-tag{
   padding:24px 40px;
   display:flex;
   gap:48px;
+=======
+}
+
+.panel-content{
+  max-width:1200px;
+  margin:0 auto;
+  padding:40px;
+  display:flex;
+  gap:60px;
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 }
 
 .panel-column{
   flex:1;
   display:flex;
   flex-direction:column;
+<<<<<<< HEAD
   max-width:340px;
+=======
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 }
 
 .panel-column-title{
   font-family:'JetBrains Mono', monospace;
+<<<<<<< HEAD
   font-size:10px;
   letter-spacing:0.12em;
   color:var(--brass);
   margin-bottom:14px;
+=======
+  font-size:11px;
+  letter-spacing:0.12em;
+  color:var(--brass);
+  margin-bottom:20px;
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   text-transform:uppercase;
 }
 
@@ -922,16 +960,25 @@ header .room-tag{
   padding:0;
   display:flex;
   flex-direction:column;
+<<<<<<< HEAD
   gap:9px;
+=======
+  gap:12px;
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 }
 
 .panel-column-links a{
   color:var(--ivory);
   text-decoration:none;
   font-family:'Space Grotesk', sans-serif;
+<<<<<<< HEAD
   font-size:13px;
   letter-spacing:0.03em;
   padding:2px 0;
+=======
+  font-size:14px;
+  letter-spacing:0.04em;
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   transition:color .3s;
 }
 
@@ -939,6 +986,7 @@ header .room-tag{
   color:var(--brass);
 }
 
+<<<<<<< HEAD
 /* Categorías en rejilla compacta de 2 columnas */
 .categories-grid{
   display:grid;
@@ -951,6 +999,8 @@ header .room-tag{
   padding:0;
 }
 
+=======
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 .nav-brand{
   font-family:'Fraunces', serif;
   font-size:1.5rem;
@@ -986,12 +1036,15 @@ header .room-tag{
     font-size:10px;
   }
 
+<<<<<<< HEAD
   /* Deja visibles los accesos importantes sin forzar zoom horizontal. */
   .nav-main-links > a[data-nav="landing"],
   .nav-main-links > a[data-nav="about"]{ display:none; }
   .nav-main-links{ gap:6px; }
   .nav-account-link,.nav-admin-link{ font-size:10px !important; padding:6px 8px !important; }
 
+=======
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   /* Panel desplegable en móvil */
   .categories-panel{
     top:60px;
@@ -1015,10 +1068,13 @@ header .room-tag{
   .panel-column-links a{
     font-size:13px;
   }
+<<<<<<< HEAD
 
   .categories-grid{
     grid-template-columns:1fr;
   }
+=======
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
 }
 
 /* ========== Estilos para Vista de Libros ========== */
@@ -1308,7 +1364,11 @@ header .room-tag{
   /* Vista de sala */
   .room-header{
     padding:10px;
+<<<<<<< HEAD
     top:0;
+=======
+    top:55px;
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   }
   
   .nav-btn{
@@ -1321,7 +1381,11 @@ header .room-tag{
   }
   
   #room-viewport{
+<<<<<<< HEAD
     height:100vh;
+=======
+    height:calc(100vh - 55px);
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
   }
   
   /* Vista de compra */
@@ -1685,6 +1749,7 @@ header .room-tag{
     font-size:12px;
   }
 }
+<<<<<<< HEAD
 
 /* ========== Estilos para Vista de Login de Administrador ========== */
 
@@ -3833,3 +3898,5 @@ body.admin-mode .admin-header-bar {
     padding: 24px 16px;
   }
 }
+=======
+>>>>>>> 58e9064dda8a5493895615cb612e635e6299a45f
