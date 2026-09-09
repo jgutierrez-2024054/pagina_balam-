@@ -3947,3 +3947,183 @@ body.admin-mode .admin-header-bar {
     padding: 24px 16px;
   }
 }
+
+/* ============================================================
+   LIQUID GLASS — SISTEMA VISUAL INSPIRADO EN APPLE
+   Superficies translúcidas, profundidad suave y esquinas continuas.
+   ============================================================ */
+:root{
+  --glass-surface:rgba(31, 54, 42, .62);
+  --glass-surface-strong:rgba(24, 43, 33, .82);
+  --glass-border:rgba(241, 238, 229, .22);
+  --glass-highlight:rgba(255, 255, 255, .17);
+  --glass-shadow:0 18px 48px rgba(4, 13, 8, .24), inset 0 1px 0 var(--glass-highlight);
+  --apple-radius:18px;
+  --apple-radius-sm:13px;
+}
+
+body{
+  background:
+    radial-gradient(ellipse 55% 40% at 7% 10%, rgba(224, 194, 106, .14), transparent 68%),
+    radial-gradient(ellipse 47% 38% at 94% 23%, rgba(79, 145, 169, .16), transparent 70%),
+    radial-gradient(ellipse 54% 42% at 52% 100%, rgba(54, 125, 91, .13), transparent 72%),
+    var(--wall);
+}
+
+/* Navegación: una barra de cristal continua y de alto contraste. */
+.main-nav{
+  background:rgba(18, 34, 26, .72);
+  border-color:var(--glass-border);
+  box-shadow:0 10px 32px rgba(0,0,0,.22), inset 0 -1px 0 rgba(255,255,255,.06);
+  backdrop-filter:blur(24px) saturate(145%);
+  -webkit-backdrop-filter:blur(24px) saturate(145%);
+}
+.categories-panel,
+.client-account-panel{
+  background:var(--glass-surface);
+  border-color:var(--glass-border);
+  border-radius:0 0 var(--apple-radius) var(--apple-radius);
+  box-shadow:var(--glass-shadow);
+  backdrop-filter:blur(26px) saturate(145%);
+  -webkit-backdrop-filter:blur(26px) saturate(145%);
+}
+.client-account-panel{ border-radius:var(--apple-radius); }
+.categories-toggle,
+.nav-account-link,
+.nav-btn,
+.landing-btn,
+.admin-btn,
+.small-btn{
+  border-radius:var(--apple-radius-sm);
+}
+.categories-toggle,
+.nav-account-link,
+.nav-btn{
+  background:linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.035));
+  border-color:rgba(241,238,229,.35);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20), 0 7px 18px rgba(0,0,0,.10);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.categories-toggle:hover,
+.nav-account-link:hover,
+.nav-btn:hover{
+  background:rgba(224,194,106,.20);
+  border-color:var(--brass-soft);
+  color:var(--ivory) !important;
+}
+
+/* Portada y contenido público. */
+#landing-hero{
+  background:
+    radial-gradient(circle at 20% 25%, rgba(224,194,106,.20), transparent 28%),
+    radial-gradient(circle at 84% 72%, rgba(63,128,150,.19), transparent 34%),
+    linear-gradient(145deg, #14281f 0%, #17271f 54%, #123128 100%);
+}
+.landing-btn{
+  background:linear-gradient(135deg, rgba(237,232,221,.20), rgba(237,232,221,.06));
+  border-color:rgba(237,232,221,.42);
+  color:var(--ivory);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 12px 28px rgba(0,0,0,.18);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.landing-btn:hover{
+  background:linear-gradient(135deg, rgba(224,194,106,.34), rgba(224,194,106,.16));
+  color:var(--ivory);
+}
+.orders-page-intro,
+.room-head{ border-color:rgba(237,232,221,.18); }
+.order-card,
+.category-artwork-card,
+.checkout-card,
+.book-card,
+.room-card,
+.admin-category-card,
+.admin-book-card,
+.admin-room-card,
+.admin-payment-card,
+.about-admin-card,
+.stat-card,
+.shortcut-card,
+.billing-total,
+.billing-breakdown,
+.billing-items{
+  background:linear-gradient(135deg, rgba(48,73,58,.66), rgba(27,48,37,.52));
+  border-color:var(--glass-border);
+  border-radius:var(--apple-radius);
+  box-shadow:var(--glass-shadow);
+  backdrop-filter:blur(16px) saturate(130%);
+  -webkit-backdrop-filter:blur(16px) saturate(130%);
+}
+.order-card:hover,
+.category-artwork-card:hover,
+.shortcut-card:hover{
+  border-color:rgba(224,194,106,.58);
+  box-shadow:0 20px 55px rgba(0,0,0,.27), inset 0 1px 0 rgba(255,255,255,.24);
+}
+
+/* Formularios y ventanas: cristal opaco para conservar la lectura. */
+.admin-modal-backdrop{ background:rgba(8, 18, 12, .62); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+.admin-modal-content,
+.client-account-panel,
+.login-container,
+.confirmation-modal{
+  background:linear-gradient(135deg, rgba(39,62,48,.89), rgba(22,42,32,.86));
+  border-color:rgba(241,238,229,.28);
+  border-radius:22px;
+  box-shadow:0 28px 78px rgba(0,0,0,.40), inset 0 1px 0 rgba(255,255,255,.18);
+  backdrop-filter:blur(28px) saturate(140%);
+  -webkit-backdrop-filter:blur(28px) saturate(140%);
+}
+.form-group input,
+.form-group select,
+.form-group textarea,
+.filter-item input,
+.filter-item select,
+.filter-group select,
+.filter-group input[type="date"],
+.order-status-select{
+  background:rgba(10, 25, 17, .58);
+  border-color:rgba(241,238,229,.25);
+  border-radius:12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus,
+.filter-item input:focus,
+.filter-item select:focus{
+  box-shadow:0 0 0 3px rgba(224,194,106,.16), inset 0 1px 0 rgba(255,255,255,.10);
+}
+
+/* Administración: mantiene la identidad oscura con volumen sutil. */
+.admin-header-bar,
+.admin-nav-tabs{
+  background:rgba(17, 34, 25, .86) !important;
+  border-color:rgba(224,194,106,.26);
+  backdrop-filter:blur(24px) saturate(140%);
+  -webkit-backdrop-filter:blur(24px) saturate(140%);
+}
+.admin-header-bar{ box-shadow:0 10px 30px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.08); }
+.admin-top-btn,
+.admin-user-profile{
+  background:linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.035));
+  border-color:rgba(237,232,221,.25);
+  border-radius:var(--apple-radius-sm);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15);
+}
+.admin-tab-btn.active{
+  border-radius:12px 12px 0 0;
+  background:linear-gradient(180deg, rgba(224,194,106,.16), rgba(224,194,106,.05));
+}
+
+@media (max-width:700px){
+  .main-nav{ background:rgba(18,34,26,.88); }
+  .client-account-panel{ right:14px; width:min(300px, calc(100vw - 28px)); }
+  .order-card,
+  .admin-category-card,
+  .admin-book-card,
+  .admin-room-card,
+  .admin-payment-card{ border-radius:16px; }
+}
