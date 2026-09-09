@@ -3,11 +3,11 @@
   "rewrites": [
     {
       "source": "/api/:match*",
-      "destination": "/server/index.js"
+      "destination": "/api/[...catchall]"
     },
     {
       "source": "/uploads/:match*",
-      "destination": "/server/index.js"
+      "destination": "/api/[...catchall]"
     },
     {
       "source": "/(.*)",
