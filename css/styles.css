@@ -1,5 +1,6 @@
 :root{
   --wall:#1b2620;
+  --wall-1:#1d2b22;
   --wall-2:#243328;
   --wall-3:#152019;
   --ivory:#EDE8DD;
@@ -2443,7 +2444,7 @@ header .room-tag{
 .room-artwork-item span{
   font-family:'Space Grotesk', sans-serif;
   font-size:13px;
-  color:var(--wall-2);
+  color:var(--ivory);
 }
 
 .room-artworks-empty{
@@ -2555,8 +2556,10 @@ header .room-tag{
 .order-detail-row span{
   font-family:'Space Grotesk', sans-serif;
   font-size:13px;
-  color:var(--wall-2);
+  color:var(--ivory);
   text-align:right;
+  max-width:62%;
+  overflow-wrap:anywhere;
 }
 
 .order-status-pending{
@@ -2907,7 +2910,100 @@ header .room-tag{
 .category-artwork-card h3{font-family:'Fraunces',serif;color:var(--ivory);margin:0 0 8px;}
 .category-artwork-card p{color:var(--stone);font-size:13px;margin:0 0 18px;}
 .category-artwork-card strong{color:var(--brass);font-family:'JetBrains Mono',monospace;}
-.order-status-select{background:var(--wall);color:var(--ivory);border:1px solid var(--line);padding:8px;border-radius:4px;}
+.order-status-select{background:var(--wall-3);color:var(--ivory);border:1px solid rgba(237,232,221,.28);padding:9px 10px;border-radius:4px;font:inherit;font-size:13px;}
+.order-status-select option{background:var(--wall-3);color:var(--ivory);}
+
+/* Pedidos del cliente: el menú público es fijo, por eso el contenido inicia
+   debajo de él y mantiene una lectura cómoda en pantallas grandes y pequeñas. */
+#view-my-orders .view-header{ display:none; }
+#my-orders-content{
+  max-width:1080px;
+  min-height:100vh;
+  margin:0 auto;
+  padding:118px 32px 88px;
+}
+.orders-page-intro{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:24px;
+  padding:0 0 24px;
+  margin-bottom:24px;
+  border-bottom:1px solid var(--line);
+}
+.orders-page-intro .eyebrow{ margin-bottom:8px; }
+.orders-page-intro h1{ color:var(--ivory); font-size:clamp(1.9rem,4vw,2.7rem); }
+.orders-page-intro p:last-child{ color:var(--stone); font-size:14px; line-height:1.55; margin-top:9px; max-width:590px; }
+#my-orders-content .loading-message,
+#my-orders-content .empty-message{ min-height:250px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+#my-orders-content .empty-message h2{ color:var(--ivory); font-size:clamp(1.5rem,3vw,2rem); }
+#my-orders-content .empty-message p{ max-width:460px; line-height:1.55; }
+.orders-list{ max-width:none; padding:0; }
+.order-card{ padding:22px 24px; margin-bottom:16px; box-shadow:0 12px 28px rgba(0,0,0,.12); }
+.order-header{ gap:16px; }
+.order-id{ color:var(--ivory); font-weight:500; }
+.order-status{ padding:5px 10px; border:1px solid currentColor; border-radius:999px; white-space:nowrap; }
+
+/* Formularios y datos administrativos: contraste uniforme para textos,
+   valores, filtros y estados, incluso en los navegadores más oscuros. */
+.admin-ecosystem .form-group input,
+.admin-ecosystem .form-group select,
+.admin-ecosystem .form-group textarea{
+  background:#111a14;
+  border-color:rgba(237,232,221,.26);
+  color:var(--ivory);
+  caret-color:var(--brass-soft);
+}
+.admin-ecosystem .form-group input::placeholder,
+.admin-ecosystem .form-group textarea::placeholder{ color:#c3c0b5; }
+.admin-ecosystem .form-group select option{ background:#111a14; color:var(--ivory); }
+.admin-ecosystem .form-group input:focus,
+.admin-ecosystem .form-group select:focus,
+.admin-ecosystem .form-group textarea:focus{ background:#152019; border-color:var(--brass); box-shadow:0 0 0 3px rgba(201,162,39,.13); }
+.admin-ecosystem .filter-group select,
+.admin-ecosystem .filter-group input[type="date"]{ color:var(--ivory); border-color:rgba(237,232,221,.26); }
+.admin-ecosystem .filter-group select option{ background:#111a14; color:var(--ivory); }
+.sales-table td{ color:var(--ivory); }
+.order-detail-row{ gap:20px; }
+.order-detail-row strong{ color:var(--brass-soft); flex:0 0 auto; }
+#order-detail-modal .admin-modal-content{ max-width:640px; }
+#order-detail-modal .form-actions .admin-btn.primary{
+  background:var(--brass);
+  border-color:var(--brass);
+  color:var(--wall-3);
+}
+#order-detail-modal .form-actions .admin-btn.primary:hover{ background:var(--brass-soft); }
+
+/* Tarjetas de administración: acciones siempre visibles y sin desbordarse. */
+.admin-category-card{ min-width:0; padding:20px; }
+.admin-category-card .admin-list-item-actions{
+  display:flex !important;
+  flex-wrap:wrap;
+  justify-content:flex-end !important;
+  gap:8px;
+  min-width:0;
+}
+.admin-category-card .small-btn{
+  color:var(--ivory);
+  padding:8px 10px;
+  font-size:12px;
+  line-height:1.15;
+  white-space:nowrap;
+}
+.admin-category-card .small-btn:hover{ color:var(--wall-3); background:var(--brass); }
+.admin-category-card .small-btn.danger:hover{ color:var(--ivory); background:var(--oxblood); border-color:var(--oxblood); }
+
+@media (max-width:700px){
+  #my-orders-content{ padding:88px 18px 56px; }
+  .orders-page-intro{ margin-bottom:18px; padding-bottom:18px; }
+  .order-card{ padding:18px; }
+  .order-header{ align-items:flex-start; flex-direction:column; }
+  .order-body{ grid-template-columns:1fr; }
+  .order-price,.order-date{ text-align:left; }
+  .order-detail-row{ align-items:flex-start; flex-direction:column; gap:6px; }
+  .order-detail-row span{ max-width:100%; text-align:left; }
+  .admin-category-card .admin-list-item-actions{ justify-content:flex-start !important; }
+}
 
 /* ============================================================
    AISLAMIENTO TOTAL Y ESTILOS DEL ECOSISTEMA DE ADMINISTRADOR

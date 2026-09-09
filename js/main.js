@@ -1093,8 +1093,8 @@ function handleHashChange(){
   } else if(hash === '#client-login'){
     switchView('clientLogin');
   } else if(hash === '#my-orders'){
-    loadMyOrders();
     switchView('myOrders');
+    loadMyOrders();
   } else if(hash.startsWith('#/categoria/')){
     const categoryId = hash.split('/')[2];
     navigateToCategory(categoryId);
@@ -3296,6 +3296,13 @@ window.viewOrder = async function(orderId) {
     const content = document.getElementById('order-detail-content');
     const item = order.artwork || order.book;
     const itemType = order.artwork ? 'Obra' : 'Libro';
+    const orderStatusLabels = {
+      PENDING: 'Pendiente',
+      CONFIRMED: 'Confirmado',
+      PAID: 'Pagado',
+      CANCELLED: 'Cancelado',
+      DELIVERED: 'Entregado'
+    };
     
     content.innerHTML = `
       <div class="order-detail-info">
@@ -3326,7 +3333,7 @@ window.viewOrder = async function(orderId) {
         <div class="order-detail-row">
           <strong>Estado:</strong>
           <select id="order-detail-status" class="order-status-select">
-            ${['PENDING','CONFIRMED','PAID','CANCELLED','DELIVERED'].map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status}</option>`).join('')}
+            ${Object.entries(orderStatusLabels).map(([status, label]) => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${label}</option>`).join('')}
           </select>
         </div>
         <div class="order-detail-row">
