@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BALAM — Galería de Arte Virtual</title>
+
+<!-- Meta tags básicos -->
+<meta name="description" content="BALAM es una galería de arte virtual que exhibe obras de arte contemporáneo guatemalteco. Explora salas interactivas, descubre obras y libros de arte.">
+<meta name="keywords" content="galería de arte, arte virtual, arte guatemalteco, arte contemporáneo, BALAM, exposición virtual">
+<meta name="author" content="BALAM">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://balam.gt/">
+<meta property="og:title" content="BALAM — Galería de Arte Virtual">
+<meta property="og:description" content="BALAM es una galería de arte virtual que exhibe obras de arte contemporáneo guatemalteco. Explora salas interactivas, descubre obras y libros de arte.">
+<meta property="og:image" content="/images/og-balam.svg">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://balam.gt/">
+<meta property="twitter:title" content="BALAM — Galería de Arte Virtual">
+<meta property="twitter:description" content="BALAM es una galería de arte virtual que exhibe obras de arte contemporáneo guatemalteco. Explora salas interactivas, descubre obras y libros de arte.">
+<meta property="twitter:image" content="/images/og-balam.svg">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+<link rel="icon" type="image/svg+xml" href="/images/balam-icon.svg">
+<link rel="manifest" href="/site.webmanifest">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;1,9..144,400&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div id="cursor">VER</div>
+
+<!-- ========== BANNER DE VISTA PREVIA PARA ADMINISTRADOR ========== -->
+<aside id="admin-preview-banner" class="admin-preview-banner" style="display:none;" aria-label="Aviso de modo administrador">
+  <div class="preview-banner-content">
+    <span class="preview-badge">MODO ADMINISTRADOR ACTIVO</span>
+    <span class="preview-text">Estás previsualizando la galería como visitante.</span>
+  </div>
+  <button id="return-to-admin-dashboard-btn" class="preview-return-btn">← Volver al Panel de Administración</button>
+</aside>
+
+<!-- ========== MENÚ DE NAVEGACIÓN PRINCIPAL ========== -->
+<nav id="main-nav" class="main-nav">
+  <div class="nav-brand">BALAM</div>
+  <div class="nav-main-links">
+    <a href="#/" data-nav="landing">Inicio</a>
+    <button id="categories-toggle" class="categories-toggle">
+      <span>Categorías</span>
+      <span class="chevron">▾</span>
+    </button>
+    <a href="#/nosotros" data-nav="about">Nosotros</a>
+    <div class="nav-account-wrap" id="client-account-wrap">
+      <button id="client-account-toggle" class="nav-account-link" title="Mi cuenta">
+        <span>Mi cuenta</span>
+        <span class="chevron">▾</span>
+      </button>
+      <div class="client-account-panel" id="client-account-panel">
+        <div class="client-account-header" id="client-account-logged" style="display:none;">
+          <strong id="client-account-name">Usuario</strong>
+          <span id="client-account-email">correo@ejemplo.com</span>
+        </div>
+        <div class="client-account-links" id="client-account-links"></div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ========== PANEL DESPLEGABLE DE CATEGORÍAS ========== -->
+<div id="categories-panel" class="categories-panel">
+  <div class="panel-content">
+    <div class="panel-column">
+      <div class="panel-column-title">Explorar</div>
+      <ul class="panel-column-links">
+        <li><a href="#/selector" data-nav="collections">Colecciones disponibles</a></li>
+        <li><a href="#/libros" data-nav="books">Nuestros libros</a></li>
+      </ul>
+    </div>
+    <div class="panel-column" id="categories-dynamic-column">
+      <div class="panel-column-title">Categorías</div>
+      <ul class="panel-column-links categories-grid" id="categories-panel-list">
+        <li><a href="#/categoria/pintura">Pintura</a></li>
+        <li><a href="#/categoria/dibujo">Dibujo</a></li>
+        <li><a href="#/categoria/tinta-china">Tinta china</a></li>
+        <li><a href="#/categoria/caricatura">Caricatura</a></li>
+        <li><a href="#/categoria/fotografia">Fotografía</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ========== VISTA 0: Landing Page ========== -->
+<div id="view-landing" class="view">
+  <section id="landing-hero">
+    <div class="spot"></div>
+    <div class="eyebrow">Galería de arte virtual</div>
+    <h1>BAL<em>a</em>M</h1>
+    <p>Una colección privada, abierta al desplazamiento. Explora las salas y descubre cada obra en detalle.</p>
+    <button id="start-experience" class="landing-btn">Comienza tu experiencia</button>
+  </section>
+</div>
+
+<!-- ========== VISTA 4: Nuestros Libros ========== -->
+<div id="view-books" class="view" style="display:none;">
+  <header class="view-header">
+    <div class="brand">BALAM</div>
+    <div class="room-tag">Nuestros Libros</div>
+  </header>
+  
+  <main id="books-content">
+    <section id="books-hero">
+      <div class="spot"></div>
+      <div class="eyebrow">Publicaciones</div>
+      <h1>Nuestros Libros</h1>
+      <p>Catálogos de exhibición, monografías y publicaciones especiales de nuestra galería.</p>
+    </section>
+
+    <section id="books-grid">
+      <!-- Los libros se generan dinámicamente con JS -->
+    </section>
+  </main>
+</div>
+
+<!-- ========== VISTA 5: Acerca de Nosotros ========== -->
+<div id="view-about" class="view" style="display:none;">
+  <header class="view-header">
+    <div class="brand">BALAM</div>
+    <div class="room-tag">Acerca de Nosotros</div>
+  </header>
+
+  <main id="about-content">
+    <section id="about-hero">
+      <div class="spot"></div>
+      <div class="eyebrow">Conoce la galería</div>
+      <h1>Acerca de Nosotros</h1>
+    </section>
+
+    <section id="about-text">
+      <div class="about-block">
+        <h2>BALAM</h2>
+        <p>Cargando información...</p>
+        <p></p>
+      </div>
+      <div class="about-block">
+        <h2>Información de Contacto</h2>
+        <div class="contact-info">
+          <div class="contact-item"><span class="contact-label">Dirección:</span><span class="contact-value">Cargando...</span></div>
+          <div class="contact-item"><span class="contact-label">Horario:</span><span class="contact-value">Cargando...</span></div>
+          <div class="contact-item"><span class="contact-label">Email:</span><span class="contact-value">Cargando...</span></div>
+          <div class="contact-item"><span class="contact-label">Teléfono:</span><span class="contact-value">Cargando...</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ========== VISTA 6: Página de Categoría ========== -->
+<div id="view-category" class="view" style="display:none;">
+  <header class="view-header">
+    <div class="brand">BALAM</div>
+    <div class="room-tag" id="category-room-tag">Categoría</div>
+  </header>
+
+  <main id="category-content">
+    <section id="category-hero">
+      <div class="spot"></div>
+      <div class="eyebrow">Categoría</div>
+      <h1 id="category-title">Categoría</h1>
+    </section>
+
+    <section id="category-description-section">
+      <p id="category-desc-text">Cargando información...</p>
+    </section>
+
+    <section id="category-artworks-grid" class="category-artworks-grid"></section>
+
+    <section id="category-status">
+      <div class="status-badge">Sin obras</div>
+      <p class="status-text">Esta categoría aún no tiene obras asociadas.</p>
+    </section>
+
+    <section id="category-back">
+      <button id="category-back-btn" class="category-back-btn">← Volver a Colecciones</button>
+    </section>
+  </main>
+</div>
+
+<!-- ========== VISTA 1: Selector de Salas ========== -->
+<div id="view-selector" class="view" style="display:none;">
+  <header class="view-header">
+    <div class="brand">BALAM</div>
+    <div class="room-tag">Colecciones Disponibles</div>
+  </header>
+  
+  <section id="selector-hero">
+    <div class="spot"></div>
+    <div class="eyebrow">Galería de arte virtual</div>
+    <h1>BAL<em>a</em>M</h1>
+    <p>Una colección privada, abierta al desplazamiento. Explora las salas y descubre cada obra en detalle.</p>
+  </section>
+
+  <main id="rooms-grid">
+    <!-- Las salas se generan dinámicamente con JS -->
+  </main>
+
+  <section id="selector-outro">
+    <h2>¿Deseas visitar la galería en persona?</h2>
+    <p>Solicita una cita privada para conocer las obras originales o recibir el catálogo completo con disponibilidad actualizada.</p>
+    <div class="foot">
+      BALAM — Galería de Arte · Ciudad de Guatemala
+    </div>
+  </section>
+</div>
+
+<!-- ========== VISTA 2: Sala en pantalla completa ========== -->
+<div id="view-room" class="view" style="display:none;">
+  <header class="view-header room-header">
+    <button id="back-to-selector" class="nav-btn">← Salas</button>
+    <div class="room-tag" id="current-room-name">Sala I</div>
+  </header>
+
+  <div id="room-viewport">
+    <div class="photo-frame" id="room-photo-frame">
+      <img id="room-image" src="" alt="Fotografía de la sala">
+      <div class="vignette"></div>
+      <div id="room-hotspots"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para tooltip rápido (se mantiene para hover en Vista 2) -->
+<div id="modal-backdrop">
+  <div id="modal">
+    <button id="modal-close" aria-label="Cerrar">✕</button>
+    <div class="m-visual"><div class="canvas" id="m-canvas"></div><div class="glass"></div></div>
+    <div class="m-body">
+      <div class="m-eyebrow" id="m-eyebrow">Sala I · Obra 01</div>
+      <div class="m-title" id="m-title">Título de la obra</div>
+      <div class="m-artist" id="m-artist">Artista</div>
+      <div class="m-meta">
+        <div>Año <span id="m-year"></span></div>
+        <div>Técnica <span id="m-medium"></span></div>
+        <div>Dimensiones <span id="m-dims"></span></div>
+        <div>Disponibilidad <span id="m-avail">Disponible</span></div>
+      </div>
+      <div class="m-desc" id="m-desc"></div>
+      <div class="m-price">
+        <div class="amount" id="m-price"></div>
+        <button id="m-buy-btn">Comprar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== VISTA 3: Detalle de compra ========== -->
+<div id="view-purchase" class="view" style="display:none;">
+  <header class="view-header">
+    <button id="back-to-room" class="nav-btn">← Volver a la sala</button>
+    <div class="room-tag">Detalle de obra</div>
+  </header>
+
+  <main id="purchase-content">
+    <div class="purchase-visual">
+      <div class="canvas" id="purchase-canvas"></div>
+      <div class="glass"></div>
+    </div>
+
+    <div class="purchase-body">
+      <div class="purchase-eyebrow" id="purchase-eyebrow">Sala I · Obra 01</div>
+      <h2 class="purchase-title" id="purchase-title">Título de la obra</h2>
+      <div class="purchase-artist" id="purchase-artist">Artista, Año</div>
+      
+      <div class="purchase-meta">
+        <div>Año <span id="purchase-year"></span></div>
+        <div>Técnica <span id="purchase-medium"></span></div>
+        <div>Dimensiones <span id="purchase-dims"></span></div>
+        <div>Disponibilidad <span id="purchase-avail">Disponible</span></div>
+      </div>
+
+      <div class="purchase-desc" id="purchase-desc"></div>
+
+      <div class="purchase-price">
+        <div class="amount" id="purchase-price"></div>
+      </div>
+
+      <div class="payment-methods">
+        <h4>Métodos de pago disponibles</h4>
+        <div id="payment-options">
+          <!-- Opciones de pago generadas dinámicamente -->
+        </div>
+      </div>
+
+      <button id="confirm-purchase" class="purchase-btn">Confirmar interés</button>
+    </div>
+  </main>
+</div>
+
+<!-- ========== VISTA 4: Login de Administrador ========== -->
+<div id="view-admin-login" class="view" style="display:none;">
+  <div class="login-container">
+    <div class="login-form">
+      <h2 class="login-title">Panel de Administración</h2>
+      <p class="login-subtitle">Inicia sesión para gestionar el contenido</p>
+      
+      <form id="admin-login-form">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" name="password" required>
+        </div>
+        
+        <button type="submit" class="login-btn">Iniciar Sesión</button>
+      </form>
+      
+      <div id="login-error" class="login-error"></div>
+      
+      <a href="#forgot-password" id="forgot-password-link" style="color: var(--stone); font-size: 12px; text-decoration: none; display: block; margin-top: 10px;">¿Olvidaste tu contraseña?</a>
+      
+      <button id="back-to-home" class="back-link">← Volver al sitio</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== VISTA 4.6: Forgot Password ========== -->
+<div id="view-forgot-password" class="view" style="display:none;">
+  <div class="login-container">
+    <div class="login-form">
+      <h2 class="login-title">Recuperar Contraseña</h2>
+      <p class="login-subtitle">Ingresa tu email para recibir un enlace de recuperación</p>
+      
+      <form id="forgot-password-form">
+        <div class="form-group">
+          <label for="forgot-email">Email</label>
+          <input type="email" id="forgot-email" name="email" required>
+        </div>
+        
+        <button type="submit" class="login-btn">Enviar Enlace</button>
+      </form>
+      
+      <div id="forgot-password-message" class="login-message"></div>
+      
+      <button id="back-to-login" class="back-link">← Volver al login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== VISTA 4.7: Reset Password ========== -->
+<div id="view-reset-password" class="view" style="display:none;">
+  <div class="login-container">
+    <div class="login-form">
+      <h2 class="login-title">Nueva Contraseña</h2>
+      <p class="login-subtitle">Ingresa tu nueva contraseña</p>
+      
+      <form id="reset-password-form">
+        <div class="form-group">
+          <label for="reset-password">Nueva Contraseña</label>
+          <input type="password" id="reset-password" name="password" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="reset-password-confirm">Confirmar Contraseña</label>
+          <input type="password" id="reset-password-confirm" name="confirmPassword" required>
+        </div>
+        
+        <button type="submit" class="login-btn">Actualizar Contraseña</button>
+      </form>
+      
+      <div id="reset-password-message" class="login-message"></div>
+      
+      <button id="back-to-login-from-reset" class="back-link">← Volver al login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== VISTA 4.5: Registro de Cliente ========== -->
+<div id="view-client-register" class="view" style="display:none;">
+  <div class="login-container">
+    <div class="login-form">
+      <h2 class="login-title">Registro de Cliente</h2>
+      <p class="login-subtitle">Crea tu cuenta para realizar compras</p>
+      
+      <form id="client-register-form">
+        <div class="form-group">
+          <label for="register-name">Nombre completo</label>
+          <input type="text" id="register-name" name="name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="register-email">Email</label>
+          <input type="email" id="register-email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="register-password">Contraseña</label>
+          <input type="password" id="register-password" name="password" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="register-phone">Teléfono (opcional)</label>
+          <input type="tel" id="register-phone" name="phone">
+        </div>
+        
+        <div class="form-group">
+          <label for="register-address">Dirección (opcional)</label>
+          <input type="text" id="register-address" name="address">
+        </div>
+        
+        <button type="submit" class="login-btn">Registrarse</button>
+      </form>
+      
+      <div id="register-error" class="login-error"></div>
+      
+      <button id="back-to-home-from-register" class="back-link">← Volver al sitio</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== VISTA 4.6: Login de Cliente ========== -->
+<div id="view-client-login" class="view" style="display:none;">
+  <div class="login-container">
+    <div class="login-form">
+      <h2 class="login-title">Iniciar Sesión</h2>
+      <p class="login-subtitle">Ingresa a tu cuenta de cliente</p>
+      
+      <form id="client-login-form">
+        <div class="form-group">
+          <label for="client-login-email">Email</label>
+          <input type="email" id="client-login-email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="client-login-password">Contraseña</label>
+          <input type="password" id="client-login-password" name="password" required>
+        </div>
+        
+        <button type="submit" class="login-btn">Iniciar Sesión</button>
+      </form>
+      
+      <div id="client-login-error" class="login-error"></div>
+      
+      <button id="go-to-register" class="back-link">¿No tienes cuenta? Regístrate</button>
+      <button id="back-to-home-from-client-login" class="back-link">← Volver al sitio</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== VISTA 4.7: Mis Compras ========== -->
+<div id="view-my-orders" class="view" style="display:none;">
+  <header class="view-header">
+    <button id="back-to-home-from-orders" class="nav-btn">← Volver al sitio</button>
+    <div class="room-tag">Mis Compras</div>
+  </header>
+
+  <main id="my-orders-content">
+    <div id="orders-loading" class="loading-message">Cargando pedidos...</div>
+    <div id="orders-empty" class="empty-message" style="display:none;">
+      <h2>No tienes pedidos aún</h2>
+      <p>Explora nuestras salas y libros para realizar tu primera compra.</p>
+      <button id="go-to-selector-from-orders" class="nav-btn">Explorar Salas</button>
+    </div>
+    <div id="orders-list-container" class="orders-list">
+      <!-- Pedidos generados dinámicamente -->
+    </div>
+  </main>
+</div>
+
+<!-- ========== VISTA 5: Ecosistema de Administración ========== -->
+<div id="view-admin-dashboard" class="view admin-ecosystem" style="display:none;">
+  <!-- Header Exclusivo de Administración -->
+  <header class="admin-header-bar">
+    <div class="admin-brand-group">
+      <div class="admin-logo-title">BALAM <span class="admin-badge-role">ADMIN</span></div>
+      <div class="admin-subtext">Ecosistema de Gestión de la Galería</div>
+    </div>
+    <div class="admin-header-actions">
+      <button id="admin-preview-client-btn" class="admin-top-btn preview-btn" type="button" title="Previsualizar el sitio web como visitante">
+        <span aria-hidden="true">↗</span> Ver Galería Pública
+      </button>
+      <div class="admin-account-wrap" id="admin-account-wrap">
+        <button class="admin-user-profile" id="admin-user-profile" type="button" title="Abrir panel de cuenta" aria-expanded="false" aria-controls="admin-account-panel">
+          <span class="admin-avatar" aria-hidden="true">👤</span>
+          <div class="admin-user-details">
+            <strong id="admin-profile-name">Administrador</strong>
+            <span id="admin-profile-email">admin@balam.gt</span>
+          </div>
+          <span class="admin-chevron" aria-hidden="true">▾</span>
+        </button>
+        <div class="admin-account-panel" id="admin-account-panel" aria-label="Menú de cuenta de administrador">
+          <div class="account-panel-user">
+            <span class="admin-avatar" aria-hidden="true">👤</span>
+            <div>
+              <strong id="account-panel-name">Administrador</strong>
+              <span id="account-panel-email">admin@balam.gt</span>
+            </div>
+          </div>
+          <div class="account-panel-role">ROL: ADMINISTRADOR</div>
+          <div class="admin-account-links">
+            <button id="admin-account-preview" type="button">Explorar galería</button>
+            <button id="admin-account-logout" type="button" class="account-logout-item">Cerrar sesión</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Barra de Navegación por Módulos del Administrador -->
+  <nav class="admin-nav-tabs" aria-label="Navegación de administración">
+    <button class="admin-tab-btn active" data-tab="overview">
+      <span class="tab-icon"></span>
+      <span class="tab-label">Resumen & Métricas</span>
+    </button>
+    <button class="admin-tab-btn" data-tab="rooms">
+      <span class="tab-icon"></span>
+      <span class="tab-label">Salas</span>
+    </button>
+    <button class="admin-tab-btn" data-tab="artworks">
+      <span class="tab-icon"></span>
+      <span class="tab-label">Obras de Arte</span>
+    </button>
+    <button class="admin-tab-btn" data-tab="books">
+      <span class="tab-icon"></span>
+      <span class="tab-label">Libros</span>
+    </button>
+    <button class="admin-tab-btn" data-tab="categories">
+      <span class="tab-icon"></span>
+      <span class="tab-label">Categorías</span>
+    </button>
+    <button class="admin-tab-btn" data-tab="payments">
+      <span class="tab-icon"></span>
+      <span class="tab-label">Métodos de Pago</span>
+    </button>
+    <button class="admin-tab-btn" data-tab="orders">
+      <span class="tab-icon"></span>
+      <span class="tab-label">Pedidos & Ventas</span>
+    </button>
+    <button class="admin-tab-btn" data-tab="about">
+      <span class="tab-icon"></span>
+      <span class="tab-label">Acerca de</span>
+    </button>
+    <button class="admin-tab-btn" data-tab="hotspots">
+      <span class="tab-icon"></span>
+      <span class="tab-label">Editor Hotspots</span>
+    </button>
+  </nav>
+
+  <!-- Contenedor Principal de Pestañas -->
+  <main class="admin-tab-container">
+    <!-- Pestaña 1: Resumen & Métricas -->
+    <section id="admin-tab-overview" class="admin-tab-panel active">
+      <div class="tab-panel-header">
+        <div>
+          <h2>Panel de Control</h2>
+          <p class="tab-subtitle">Estado general, ventas e ingresos del catálogo de arte.</p>
+        </div>
+      </div>
+      
+      <div class="admin-stats">
+        <div class="stat-card">
+          <div class="stat-icon"></div>
+          <div class="stat-info">
+            <h3>Ventas del mes</h3>
+            <div class="stat-value" id="stat-total-orders">0</div>
+          </div>
+        </div>
+        <div class="stat-card highlight">
+          <div class="stat-icon"></div>
+          <div class="stat-info">
+            <h3>Monto vendido del mes</h3>
+            <div class="stat-value" id="stat-total-revenue">Q0</div>
+          </div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-icon"></div>
+          <div class="stat-info">
+            <h3>Pedidos Pendientes</h3>
+            <div class="stat-value" id="stat-pending-orders">0</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"></div>
+          <div class="stat-info">
+            <h3>Clientes atendidos</h3>
+            <div class="stat-value" id="stat-month-customers">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-section admin-section-wide" id="admin-billing-section">
+        <div class="admin-section-heading">
+          <div>
+            <span class="section-kicker">Resumen financiero</span>
+            <h2>Facturación del mes</h2>
+          </div>
+          <span id="billing-period" class="billing-period">Mes actual</span>
+        </div>
+        <div id="billing-summary" class="billing-summary" aria-live="polite">
+          <p class="admin-empty-state">Cargando facturación…</p>
+        </div>
+      </div>
+
+      <div class="admin-quick-shortcuts">
+        <div class="shortcut-card" id="shortcut-add-artwork">
+          <span class="shortcut-icon"></span>
+          <strong>Nueva Obra</strong>
+          <p>Publicar una nueva obra en una sala</p>
+        </div>
+        <div class="shortcut-card" id="shortcut-add-room">
+          <span class="shortcut-icon"></span>
+          <strong>Nueva Sala</strong>
+          <p>Crear un nuevo espacio virtual o fotográfico</p>
+        </div>
+        <div class="shortcut-card" id="shortcut-add-book">
+          <span class="shortcut-icon"></span>
+          <strong>Nuevo Libro</strong>
+          <p>Agregar catálogo o monografía editorial</p>
+        </div>
+        <div class="shortcut-card" id="shortcut-view-orders">
+          <span class="shortcut-icon"></span>
+          <strong>Revisar Pedidos</strong>
+          <p>Gestionar y confirmar pedidos de clientes</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pestaña 2: Gestión de Salas -->
+    <section id="admin-tab-rooms" class="admin-tab-panel">
+      <div class="tab-panel-header">
+        <div>
+          <h2>Gestión de Salas de Exhibición</h2>
+          <p class="tab-subtitle">Administra los espacios virtuales de la galería, temas y orden de recorrido.</p>
+        </div>
+        <div class="panel-header-actions">
+          <button id="add-room-btn" class="admin-btn primary"><span>+</span> Agregar Sala</button>
+        </div>
+      </div>
+      <div id="rooms-list" class="admin-cards-grid">
+        <!-- Generado dinámicamente -->
+      </div>
+    </section>
+
+    <!-- Pestaña 3: Gestión de Obras de Arte -->
+    <section id="admin-tab-artworks" class="admin-tab-panel">
+      <div class="tab-panel-header">
+        <div>
+          <h2>Catálogo de Obras de Arte</h2>
+          <p class="tab-subtitle">Agrega, edita, elimina y controla la disponibilidad y precio de las obras.</p>
+        </div>
+        <div class="panel-header-actions">
+          <button id="add-artwork-btn" class="admin-btn primary"><span>+</span> Agregar Obra</button>
+          <button id="hotspot-editor-btn" class="admin-btn"><span></span> Editor de Hotspots</button>
+        </div>
+      </div>
+
+      <!-- Filtros de Obras -->
+      <div class="artworks-filter-bar">
+        <div class="filter-item search-filter">
+          <label for="artwork-search-filter">Buscar obra / artista:</label>
+          <input type="text" id="artwork-search-filter" placeholder="Escribe título o artista...">
+        </div>
+        <div class="filter-item">
+          <label for="artwork-room-filter">Filtrar por Sala:</label>
+          <select id="artwork-room-filter">
+            <option value="">Todas las salas</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label for="artwork-status-filter">Disponibilidad:</label>
+          <select id="artwork-status-filter">
+            <option value="">Todos los estados</option>
+            <option value="AVAILABLE">Disponible</option>
+            <option value="RESERVED">Reservada</option>
+            <option value="SOLD">Vendida</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="artworks-admin-list" class="artworks-admin-table-wrap">
+        <!-- Generado dinámicamente -->
+      </div>
+    </section>
+
+    <!-- Pestaña 4: Gestión de Libros -->
+    <section id="admin-tab-books" class="admin-tab-panel">
+      <div class="tab-panel-header">
+        <div>
+          <h2>Publicaciones y Libros de Arte</h2>
+          <p class="tab-subtitle">Gestiona monografías, catálogos impresos y publicaciones especiales.</p>
+        </div>
+        <div class="panel-header-actions">
+          <button id="add-book-btn" class="admin-btn primary"><span>+</span> Agregar Libro</button>
+        </div>
+      </div>
+      <div id="books-list" class="admin-books-grid">
+        <!-- Generado dinámicamente -->
+      </div>
+    </section>
+
+    <!-- Pestaña 5: Gestión de Categorías -->
+    <section id="admin-tab-categories" class="admin-tab-panel">
+      <div class="tab-panel-header">
+        <div>
+          <h2>Categorías y Técnicas Artísticas</h2>
+          <p class="tab-subtitle">Organiza las obras por técnica (Pintura, Grabado, Escultura, etc.) o temática.</p>
+        </div>
+        <div class="panel-header-actions">
+          <button id="add-category-btn" class="admin-btn primary"><span>+</span> Agregar Categoría</button>
+        </div>
+      </div>
+      <div id="categories-list" class="admin-categories-grid">
+        <!-- Generado dinámicamente -->
+      </div>
+    </section>
+
+    <!-- Pestaña 6: Métodos de Pago -->
+    <section id="admin-tab-payments" class="admin-tab-panel">
+      <div class="tab-panel-header">
+        <div>
+          <h2>Métodos de Pago</h2>
+          <p class="tab-subtitle">Configura las opciones de pago que los clientes pueden elegir en la galería.</p>
+        </div>
+        <div class="panel-header-actions">
+          <button id="add-payment-method-btn" class="admin-btn primary"><span>+</span> Agregar Método</button>
+        </div>
+      </div>
+      <div id="payment-methods-list" class="admin-payments-grid">
+        <!-- Generado dinámicamente -->
+      </div>
+    </section>
+
+    <!-- Pestaña 7: Pedidos y Ventas -->
+    <section id="admin-tab-orders" class="admin-tab-panel">
+      <div class="tab-panel-header">
+        <div>
+          <h2>Gestión de Pedidos & Ventas</h2>
+          <p class="tab-subtitle">Supervisa las intenciones de compra, confirma pagos y actualiza entregas.</p>
+        </div>
+      </div>
+
+      <div class="orders-filters-card">
+        <div class="orders-filters">
+          <div class="filter-group">
+            <label for="filter-status">Estado:</label>
+            <select id="filter-status">
+              <option value="">Todos los estados</option>
+              <option value="PENDING">Pendiente</option>
+              <option value="CONFIRMED">Confirmado</option>
+              <option value="PAID">Pagado</option>
+              <option value="DELIVERED">Entregado</option>
+              <option value="CANCELLED">Cancelado</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filter-date-from">Desde:</label>
+            <input type="date" id="filter-date-from">
+          </div>
+          <div class="filter-group">
+            <label for="filter-date-to">Hasta:</label>
+            <input type="date" id="filter-date-to">
+          </div>
+          <div class="filter-actions-group">
+            <button id="apply-filters" class="admin-btn primary">Filtrar</button>
+            <button id="clear-filters" class="admin-btn">Limpiar</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="orders-list" class="admin-orders-list">
+        <!-- Lista de pedidos generada dinámicamente -->
+      </div>
+
+      <div class="admin-section admin-section-wide" style="margin-top: 30px;">
+        <h2>Histórico de Ventas Mensuales</h2>
+        <div id="sales-history-content">
+          <!-- Histórico generado dinámicamente -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Pestaña 8: Acerca de Nosotros -->
+    <section id="admin-tab-about" class="admin-tab-panel">
+      <div class="tab-panel-header">
+        <div>
+          <h2>Información Institucional</h2>
+          <p class="tab-subtitle">Edita los textos de presentación de BALAM, dirección de la galería física y datos de contacto.</p>
+        </div>
+        <div class="panel-header-actions">
+          <button id="edit-about-btn" class="admin-btn primary"><span>✏️</span> Editar Información</button>
+        </div>
+      </div>
+      <div id="about-admin-preview" class="about-admin-card">
+        <!-- Generado dinámicamente -->
+      </div>
+    </section>
+
+    <!-- Pestaña 9: Editor de Hotspots -->
+    <section id="admin-tab-hotspots" class="admin-tab-panel">
+      <div class="tab-panel-header">
+        <div>
+          <h2>Editor Visual de Hotspots</h2>
+          <p class="tab-subtitle">Arrastra y redimensiona los puntos interactivos sobre las fotografías de las salas.</p>
+        </div>
+        <div class="panel-header-actions">
+          <button id="tab-save-hotspots-btn" class="admin-btn primary"><span>💾</span> Guardar Hotspots</button>
+        </div>
+      </div>
+
+      <div class="hotspot-tab-editor">
+        <div class="hotspot-editor-controls">
+          <div class="form-group" style="flex:1; min-width:220px;">
+            <label for="tab-hotspot-room-select">Seleccionar Sala:</label>
+            <select id="tab-hotspot-room-select">
+              <!-- Opciones de sala cargadas dinámicamente -->
+            </select>
+          </div>
+          <button id="tab-add-hotspot-btn" class="admin-btn"><span>+</span> Agregar Nuevo Hotspot</button>
+        </div>
+        <div class="hotspot-editor-canvas" style="min-height: 520px;">
+          <div id="tab-hotspot-image-container" style="position:relative; width:100%; height:100%;">
+            <img id="tab-hotspot-image" src="" alt="Sala" style="width:100%; height:100%; object-fit:contain;">
+            <div id="tab-hotspot-points" style="position:absolute; inset:0;"></div>
+          </div>
+        </div>
+        <div class="hotspot-editor-info">
+          <p>💡 Haz clic y arrastra para mover el hotspot. Arrastra las esquinas doradas para redimensionar el área de interacción sobre la obra.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Mensajes de acción y confirmación, consistentes con la identidad de BALAM -->
+<div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+<div id="action-confirm-modal" class="action-confirm-modal" aria-hidden="true">
+  <div class="action-confirm-backdrop" data-confirm-cancel></div>
+  <section class="action-confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="action-confirm-title">
+    <span class="action-confirm-mark">!</span>
+    <p class="section-kicker">Acción sensible</p>
+    <h2 id="action-confirm-title">¿Confirmar acción?</h2>
+    <p id="action-confirm-message">Este cambio no se puede deshacer.</p>
+    <div class="action-confirm-actions">
+      <button type="button" class="admin-btn" data-confirm-cancel>Cancelar</button>
+      <button type="button" id="action-confirm-accept" class="admin-btn danger">Sí, eliminar</button>
+    </div>
+  </section>
+</div>
+
+<!-- ========== MODAL DE CONFIRMACIÓN ========== -->
+<div id="confirmation-modal" class="confirmation-modal" style="display: none;">
+  <div class="confirmation-modal-backdrop"></div>
+  <div class="confirmation-modal-content">
+    <div class="confirmation-modal-icon">✓</div>
+    <h3 class="confirmation-modal-title">Pedido Creado Exitosamente</h3>
+    <div class="confirmation-modal-body">
+      <p class="confirmation-modal-text">Tu pedido ha sido registrado correctamente.</p>
+      <div class="confirmation-modal-details">
+        <div class="confirmation-modal-detail">
+          <span class="detail-label">Folio:</span>
+          <span class="detail-value" id="confirmation-folio">---</span>
+        </div>
+        <div class="confirmation-modal-detail">
+          <span class="detail-label">Método de pago:</span>
+          <span class="detail-value" id="confirmation-payment">---</span>
+        </div>
+      </div>
+    </div>
+    <button id="confirmation-modal-close" class="confirmation-modal-btn">Ver Mis Pedidos</button>
+  </div>
+</div>
+
+<!-- ========== MODAL DE AGREGAR SALA ========== -->
+<div id="add-room-modal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop"></div>
+  <div class="admin-modal-content">
+    <h3 id="room-modal-title">Agregar Nueva Sala</h3>
+    <form id="add-room-form">
+      <input type="hidden" id="room-id" name="id">
+      <div class="form-group">
+        <label for="room-name">Nombre de la Sala</label>
+        <input type="text" id="room-name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="room-theme">Tema</label>
+        <input type="text" id="room-theme" name="theme" required>
+      </div>
+      <div class="form-group">
+        <label for="room-type">Tipo</label>
+        <select id="room-type" name="type">
+          <option value="GRADIENT">Gradiente (sin imagen)</option>
+          <option value="PHOTO">Foto (con imagen)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="room-image-url">URL de Imagen (opcional)</label>
+        <input type="url" id="room-image-url" name="imageUrl" placeholder="https://...">
+        <label for="room-image-file">O subir imagen</label>
+        <input type="file" id="room-image-file" accept="image/jpeg,image/png,image/webp,image/gif">
+      </div>
+      <div class="form-group">
+        <label for="room-order">Orden</label>
+        <input type="number" id="room-order" name="order" value="0">
+      </div>
+      <div class="form-actions">
+        <button type="button" id="cancel-add-room">Cancelar</button>
+        <button type="submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== MODAL DE AGREGAR LIBRO ========== -->
+<div id="add-book-modal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop"></div>
+  <div class="admin-modal-content">
+    <h3 id="book-modal-title">Agregar Nuevo Libro</h3>
+    <form id="add-book-form">
+      <input type="hidden" id="book-id" name="id">
+      <div class="form-group">
+        <label for="book-title">Título</label>
+        <input type="text" id="book-title" name="title" required>
+      </div>
+      <div class="form-group">
+        <label for="book-author">Autor</label>
+        <input type="text" id="book-author" name="author" required>
+      </div>
+      <div class="form-group">
+        <label for="book-year">Año</label>
+        <input type="text" id="book-year" name="year" required>
+      </div>
+      <div class="form-group">
+        <label for="book-price">Precio (ej: Q3,500)</label>
+        <input type="text" id="book-price" name="price" required>
+      </div>
+      <div class="form-group">
+        <label for="book-description">Descripción</label>
+        <textarea id="book-description" name="description" rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="book-cover">URL de Portada (opcional)</label>
+        <input type="url" id="book-cover" name="coverUrl" placeholder="https://...">
+        <label for="book-cover-file">O subir portada</label>
+        <input type="file" id="book-cover-file" accept="image/jpeg,image/png,image/webp,image/gif">
+      </div>
+      <div class="form-actions">
+        <button type="button" id="cancel-add-book">Cancelar</button>
+        <button type="submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== MODAL DE AGREGAR OBRA ========== -->
+<div id="add-artwork-modal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop"></div>
+  <div class="admin-modal-content">
+    <h3 id="artwork-modal-title">Agregar Nueva Obra</h3>
+    <form id="add-artwork-form">
+      <input type="hidden" id="artwork-id" name="id">
+      <div class="form-group">
+        <label for="artwork-room">Sala</label>
+        <select id="artwork-room" name="roomId" required>
+          <!-- Opciones cargadas dinámicamente -->
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="artwork-title">Título</label>
+        <input type="text" id="artwork-title" name="title" required>
+      </div>
+      <div class="form-group">
+        <label for="artwork-artist">Artista</label>
+        <input type="text" id="artwork-artist" name="artist" required>
+      </div>
+      <div class="form-group">
+        <label for="artwork-year">Año</label>
+        <input type="text" id="artwork-year" name="year" required>
+      </div>
+      <div class="form-group">
+        <label for="artwork-medium">Medio</label>
+        <input type="text" id="artwork-medium" name="medium" placeholder="ej: Óleo sobre lienzo">
+      </div>
+      <div class="form-group">
+        <label for="artwork-dims">Dimensiones</label>
+        <input type="text" id="artwork-dims" name="dims" placeholder="ej: 100 x 80 cm">
+      </div>
+      <div class="form-group">
+        <label for="artwork-price">Precio (ej: Q3,500)</label>
+        <input type="text" id="artwork-price" name="price" required>
+      </div>
+      <div class="form-group">
+        <label for="artwork-description">Descripción</label>
+        <textarea id="artwork-description" name="description" rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <div class="form-group">
+        <label for="artwork-status">Estado</label>
+        <select id="artwork-status" name="status">
+          <option value="AVAILABLE">Disponible</option>
+          <option value="RESERVED">Reservada</option>
+          <option value="SOLD">Vendida</option>
+        </select>
+      </div>
+      <label for="artwork-category">Categoría (opcional)</label>
+        <select id="artwork-category" name="categoryId">
+          <option value="">Sin categoría</option>
+          <!-- Opciones cargadas dinámicamente -->
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Posición del Hotspot (opcional)</label>
+        <div class="hotspot-position-inputs">
+          <div>
+            <label for="artwork-hotspot-left">Left (%)</label>
+            <input type="number" id="artwork-hotspot-left" name="hotspotLeft" min="0" max="100" step="0.1">
+          </div>
+          <div>
+            <label for="artwork-hotspot-top">Top (%)</label>
+            <input type="number" id="artwork-hotspot-top" name="hotspotTop" min="0" max="100" step="0.1">
+          </div>
+          <div>
+            <label for="artwork-hotspot-width">Width (%)</label>
+            <input type="number" id="artwork-hotspot-width" name="hotspotWidth" min="0" max="100" step="0.1">
+          </div>
+          <div>
+            <label for="artwork-hotspot-height">Height (%)</label>
+            <input type="number" id="artwork-hotspot-height" name="hotspotHeight" min="0" max="100" step="0.1">
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" id="cancel-add-artwork">Cancelar</button>
+        <button type="submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== MODAL DE AGREGAR CATEGORÍA ========== -->
+<div id="add-category-modal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop"></div>
+  <div class="admin-modal-content">
+    <h3 id="category-modal-title">Agregar Nueva Categoría</h3>
+    <form id="add-category-form">
+      <input type="hidden" id="category-slug" name="slug">
+      <div class="form-group">
+        <label for="category-name">Nombre</label>
+        <input type="text" id="category-name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="category-description">Descripción</label>
+        <textarea id="category-description" name="description" rows="4"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" id="cancel-add-category">Cancelar</button>
+        <button type="submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== MODAL DE AGREGAR MÉTODO DE PAGO ========== -->
+<div id="add-payment-method-modal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop"></div>
+  <div class="admin-modal-content">
+    <h3 id="payment-method-modal-title">Agregar Nuevo Método de Pago</h3>
+    <form id="add-payment-method-form">
+      <input type="hidden" id="payment-method-id" name="id">
+      <div class="form-group">
+        <label for="payment-method-label">Etiqueta</label>
+        <input type="text" id="payment-method-label" name="label" required placeholder="ej: Tarjeta de crédito">
+      </div>
+      <div class="form-group">
+        <label for="payment-method-icon">Icono (emoji)</label>
+        <input type="text" id="payment-method-icon" name="icon" required placeholder="ej: 💳">
+      </div>
+      <div class="form-group">
+        <label class="toggle-field" for="payment-method-active">
+          <span>Activo en el checkout</span>
+          <input type="checkbox" id="payment-method-active" name="active" checked>
+        </label>
+      </div>
+      <div class="form-actions">
+        <button type="button" id="cancel-add-payment-method">Cancelar</button>
+        <button type="submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== MODAL DE EDITAR ACERCA DE NOSOTROS ========== -->
+<div id="edit-about-modal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop"></div>
+  <div class="admin-modal-content">
+    <h3>Editar Información - Acerca de Nosotros</h3>
+    <form id="edit-about-form">
+      <div class="form-group">
+        <label for="about-title">Título</label>
+        <input type="text" id="about-title" name="title" required>
+      </div>
+      <div class="form-group">
+        <label for="about-description">Descripción</label>
+        <textarea id="about-description" name="description" rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="about-address">Dirección</label>
+        <input type="text" id="about-address" name="address">
+      </div>
+      <div class="form-group">
+        <label for="about-phone">Teléfono</label>
+        <input type="text" id="about-phone" name="phone">
+      </div>
+      <div class="form-group">
+        <label for="about-email">Email</label>
+        <input type="email" id="about-email" name="email">
+      </div>
+      <div class="form-group">
+        <label for="about-hours">Horario</label>
+        <input type="text" id="about-hours" name="hours">
+      </div>
+      <div class="form-actions">
+        <button type="button" id="cancel-edit-about">Cancelar</button>
+        <button type="submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== MODAL DE DETALLE DE PEDIDO ========== -->
+<div id="order-detail-modal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop"></div>
+  <div class="admin-modal-content">
+    <h3>Detalle del Pedido</h3>
+    <div id="order-detail-content">
+      <!-- Contenido del pedido generado dinámicamente -->
+    </div>
+    <div class="form-actions">
+      <button type="button" id="save-order-status" class="admin-btn primary">Guardar Estado</button>
+      <button type="button" id="close-order-detail" class="admin-btn">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL DE EDITOR DE HOTSPOTS ========== -->
+<div id="hotspot-editor-modal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop"></div>
+  <div class="admin-modal-content hotspot-editor-content">
+    <h3>Editor de Hotspots</h3>
+    <div class="hotspot-editor-controls">
+      <div class="form-group">
+        <label for="hotspot-room-select">Seleccionar Sala:</label>
+        <select id="hotspot-room-select">
+          <!-- Opciones cargadas dinámicamente -->
+        </select>
+      </div>
+      <button id="add-hotspot-btn" class="admin-btn primary">Agregar Hotspot</button>
+      <button id="save-hotspots-btn" class="admin-btn primary">Guardar Cambios</button>
+      <button id="cancel-hotspot-editor" class="admin-btn">Cerrar</button>
+    </div>
+    <div class="hotspot-editor-canvas">
+      <div id="hotspot-editor-image-container">
+        <img id="hotspot-editor-image" src="" alt="Sala">
+        <div id="hotspot-editor-hotspots">
+          <!-- Hotspots generados dinámicamente -->
+        </div>
+      </div>
+    </div>
+    <div class="hotspot-editor-info">
+      <p>Arrastra los hotspots para moverlos. Usa las esquinas para redimensionar.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL DE PERFIL DE ADMINISTRADOR ========== -->
+<div id="admin-profile-modal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop"></div>
+  <div class="admin-modal-content" style="max-width:440px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--line); padding-bottom:12px;">
+      <h3 style="margin:0; font-size:18px; display:flex; align-items:center; gap:8px;">👤 Perfil de Administrador</h3>
+      <button id="close-admin-profile" class="small-btn" type="button" style="border:none; background:transparent; color:var(--stone); font-size:16px; cursor:pointer;">✕</button>
+    </div>
+    <div style="text-align:center; padding:10px 0 20px;">
+      <div style="width:68px; height:68px; border-radius:50%; background:rgba(201,162,39,0.15); border:2px solid var(--brass); display:flex; align-items:center; justify-content:center; font-size:28px; margin:0 auto 12px;">👤</div>
+      <h3 id="profile-modal-name" style="color:var(--ivory); margin:0 0 4px; font-size:18px;">Administrador</h3>
+      <p id="profile-modal-email" style="color:var(--stone); font-size:13px; margin:0 0 14px;">admin@balam.gt</p>
+      <div style="display:inline-block; padding:4px 12px; background:rgba(201,162,39,0.18); border:1px solid var(--brass); color:var(--brass-soft); border-radius:12px; font-size:11px; font-weight:700; letter-spacing:0.05em; margin-bottom:20px;">ROL: ADMINISTRADOR (CONTROL TOTAL)</div>
+      
+      <div style="background:var(--wall-2); border:1px solid var(--line); border-radius:6px; padding:14px; text-align:left; font-size:13px; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="color:var(--stone);">Estado de Sesión:</span><span style="color:#79c58b; font-weight:600;">● Activa</span></div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="color:var(--stone);">Permisos:</span><span style="color:var(--ivory);">Gestión Total de Catálogo</span></div>
+        <div style="display:flex; justify-content:space-between;"><span style="color:var(--stone);">Seguridad:</span><span style="color:var(--ivory);">Token JWT Autorizado</span></div>
+      </div>
+
+      <div style="display:flex; gap:10px; justify-content:center;">
+        <button id="profile-modal-logout-btn" class="admin-btn secondary small" type="button">Cerrar Sesión</button>
+        <button id="profile-modal-close-btn" class="admin-btn primary small" type="button">Entendido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL PARA ASIGNAR / CREAR OBRA PARA HOTSPOT ========== -->
+<div id="add-hotspot-artwork-modal" class="admin-modal" style="display: none;">
+  <div class="admin-modal-backdrop"></div>
+  <div class="admin-modal-content" style="max-width:480px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--line); padding-bottom:12px;">
+      <h3 style="margin:0; font-size:18px; display:flex; align-items:center; gap:8px;">🎯 Agregar Hotspot a la Sala</h3>
+      <button id="close-add-hotspot-artwork" class="small-btn" type="button" style="border:none; background:transparent; color:var(--stone); font-size:16px; cursor:pointer;">✕</button>
+    </div>
+    <form id="add-hotspot-artwork-form">
+      <p style="font-size:13px; color:var(--stone); margin-bottom:16px;">Selecciona una obra existente para ubicarla en la fotografía o crea una nueva obra rápidamente:</p>
+      
+      <div class="form-group">
+        <label for="hotspot-assign-select">Seleccionar Obra Existente o Nueva:</label>
+        <select id="hotspot-assign-select" style="width:100%; background:var(--wall-2); color:var(--ivory); border:1px solid var(--line); padding:10px; border-radius:6px;">
+          <!-- Opciones dinámicas -->
+        </select>
+      </div>
+
+      <div id="hotspot-create-new-fields" style="display:none; border-top:1px solid var(--line); padding-top:14px; margin-top:14px;">
+        <div class="form-group">
+          <label for="hotspot-new-title">Título de la Obra *</label>
+          <input type="text" id="hotspot-new-title" placeholder="Ej. Retrato en Óleo">
+        </div>
+        <div class="form-group">
+          <label for="hotspot-new-artist">Artista *</label>
+          <input type="text" id="hotspot-new-artist" placeholder="Ej. Balam">
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label for="hotspot-new-year">Año *</label>
+            <input type="text" id="hotspot-new-year" value="2025">
+          </div>
+          <div class="form-group">
+            <label for="hotspot-new-price">Precio *</label>
+            <input type="text" id="hotspot-new-price" placeholder="Ej. Q3,500">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="hotspot-new-medium">Técnica</label>
+          <input type="text" id="hotspot-new-medium" placeholder="Ej. Óleo sobre lienzo">
+        </div>
+        <div class="form-group">
+          <label for="hotspot-new-desc">Descripción</label>
+          <textarea id="hotspot-new-desc" rows="2" placeholder="Breve reseña de la obra..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions" style="margin-top:20px;">
+        <button type="button" id="cancel-add-hotspot-artwork" class="admin-btn">Cancelar</button>
+        <button type="submit" id="submit-add-hotspot-artwork" class="admin-btn primary">Colocar en Editor</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

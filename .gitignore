@@ -1,0 +1,32 @@
+# Dependencias
+node_modules/
+
+# Archivos de configuración del IDE
+.vscode/
+.idea/
+
+# Archivos de backup
+*.backup
+index.html.backup
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de log
+*.log
+npm-debug.log*
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Variables de entorno
+.env
+.env.local
+.env.*.local
+
+/uploads/
+# Archivos subidos en producción/local
+/uploads/*
+!/uploads/.gitkeep

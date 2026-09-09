@@ -1,0 +1,167 @@
+// Este es tu archivo de esquema de Prisma
+// Más información: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Usuarios
+model User {
+  id                String   @id @default(cuid())
+  name              String
+  email             String   @unique
+  password          String
+  phone             String?
+  address           String?
+  role              UserRole @default(CLIENT)
+  resetToken        String?
+  resetTokenExpires DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  orders            Order[]
+}
+
+enum UserRole {
+  ADMIN
+  CLIENT
+}
+
+// Modelo de Salas
+model Room {
+  id          String    @id @default(cuid())
+  name        String
+  theme       String
+  imageUrl    String?
+  type        RoomType  @default(GRADIENT)
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  artworks    Artwork[]
+}
+
+enum RoomType {
+  PHOTO
+  GRADIENT
+}
+
+// Modelo de Obras (Artworks)
+model Artwork {
+  id              String      @id @default(cuid())
+  roomId          String
+  title           String
+  artist          String
+  year            String
+  medium          String
+  dims            String
+  price           String
+  priceAmount     Int
+  description     String
+  status          ArtworkStatus @default(AVAILABLE)
+  hotspotLeft     Float?
+  hotspotTop      Float?
+  hotspotWidth    Float?
+  hotspotHeight   Float?
+  categoryId      String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  room            Room        @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  category        Category?   @relation(fields: [categoryId], references: [id])
+  orders          Order[]
+}
+
+enum ArtworkStatus {
+  AVAILABLE
+  SOLD
+  RESERVED
+}
+
+// Modelo de Libros
+model Book {
+  id          String   @id @default(cuid())
+  title       String
+  author      String
+  year        String
+  description String
+  price       String
+  priceAmount Int
+  coverUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders      Order[]
+}
+
+// Modelo de Categorías
+model Category {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  description String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  artworks    Artwork[]
+}
+
+// Modelo de Pedidos (Orders)
+model Order {
+  id              String      @id @default(cuid())
+  userId          String
+  itemType        ItemType
+  artworkId       String?
+  bookId          String?
+  priceAtPurchase String
+  priceAmount     Int
+  paymentMethod   String
+  status          OrderStatus @default(PENDING)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  user            User        @relation(fields: [userId], references: [id])
+  artwork         Artwork?    @relation(fields: [artworkId], references: [id])
+  book            Book?       @relation(fields: [bookId], references: [id])
+}
+
+enum ItemType {
+  ARTWORK
+  BOOK
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PAID
+  CANCELLED
+  DELIVERED
+}
+
+// Modelo de Métodos de Pago
+model PaymentMethod {
+  id      String  @id @default(cuid())
+  label   String
+  icon    String
+  active  Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Modelo de Contenido "Acerca de Nosotros"
+model AboutContent {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  address     String?
+  phone       String?
+  email       String?
+  hours       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
