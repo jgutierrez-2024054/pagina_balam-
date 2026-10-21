@@ -2920,6 +2920,7 @@ header .room-tag{
 .category-artwork-card h3{font-family:'Fraunces',serif;color:var(--ivory);margin:0 0 8px;}
 .category-artwork-card p{color:var(--stone);font-size:13px;margin:0 0 18px;}
 .category-artwork-card strong{color:var(--brass);font-family:'JetBrains Mono',monospace;}
+.category-artwork-image{display:none}
 .order-status-select{background:var(--wall-3);color:var(--ivory);border:1px solid rgba(237,232,221,.28);padding:9px 10px;border-radius:4px;font:inherit;font-size:13px;}
 .order-status-select option{background:var(--wall-3);color:var(--ivory);}
 
@@ -4781,3 +4782,97 @@ button:focus-visible,a:focus-visible,[role="tab"]:focus-visible,input:focus-visi
 .admin-tab-btn.has-notifications .tab-icon{color:#f0c8a8}
 @keyframes admin-order-ping{0%{box-shadow:0 0 0 0 rgba(216,93,91,.65);transform:scale(.82)}55%{box-shadow:0 0 0 8px rgba(216,93,91,0);transform:scale(1.12)}100%{box-shadow:0 2px 8px rgba(0,0,0,.28);transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.admin-order-notification.is-pinging{animation:none}}
+
+/* Experiencia móvil de descubrimiento: mosaico editorial y navegación inferior. */
+.mobile-discovery-nav{display:none}
+@media (max-width:760px){
+  body.show-mobile-nav:not(.admin-mode):not(.immersive-room) #mobile-discovery-nav{
+    position:fixed;z-index:1250;inset:auto 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+    min-height:64px;padding:7px 8px calc(7px + env(safe-area-inset-bottom));
+    border-top:1px solid rgba(241,238,229,.12);background:rgba(12,27,19,.94);color:var(--ivory);
+    box-shadow:0 -10px 30px rgba(0,0,0,.2);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);
+  }
+  .mobile-nav-item{display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;border-radius:12px;background:transparent;color:rgba(241,238,229,.67);font:500 10px/1.15 'Space Grotesk',sans-serif;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .mobile-nav-icon{display:grid;place-items:center;width:27px;height:24px;font:24px/1 'Space Grotesk',sans-serif;color:currentColor}
+  .mobile-nav-item.active{color:var(--brass-soft)}
+  .mobile-nav-item.active .mobile-nav-icon{border-radius:9px;background:rgba(224,194,106,.13)}
+  .mobile-nav-item:focus-visible{outline:2px solid var(--brass-soft);outline-offset:-2px}
+
+  #main-nav{height:58px;padding:0 17px;background:rgba(14,29,21,.96);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+  #main-nav .nav-brand{font-size:1.25rem;letter-spacing:.06em}
+  #main-nav .nav-main-links{display:none}
+  #view-selector>.view-header,#view-catalog>.view-header{display:none}
+  #view-selector,#view-catalog{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+
+  #selector-hero{height:auto;min-height:0;align-items:flex-start;padding:76px 17px 10px;text-align:left;background:none}
+  #selector-hero .spot{width:260px;height:260px;left:70%;top:-90px;opacity:.42}
+  #selector-hero .eyebrow{position:relative;margin:0 0 7px;font-size:9px;letter-spacing:.17em}
+  #selector-hero h1{position:relative;font-size:2.35rem;line-height:1;letter-spacing:-.04em}
+  #selector-hero p{position:relative;max-width:340px;margin:8px 0 0;font-size:12px;line-height:1.5}
+  #rooms-grid{display:block;column-count:2;column-gap:11px;padding:16px 12px 32px}
+  .room-card{display:inline-block;width:100%;margin:0 0 11px;break-inside:avoid;overflow:hidden;border:0;border-radius:15px;background:transparent;box-shadow:0 9px 22px rgba(0,0,0,.18);vertical-align:top}
+  .room-card:hover{transform:none}
+  .room-card .thumbnail{height:198px;aspect-ratio:auto;background-position:center;background-size:cover}
+  .room-card:nth-child(4n + 2) .thumbnail{height:242px}
+  .room-card:nth-child(4n + 3) .thumbnail{height:166px}
+  .room-card:nth-child(4n) .thumbnail{height:218px}
+  .room-card .thumbnail::after{background:linear-gradient(180deg,rgba(5,12,8,.02) 35%,rgba(5,12,8,.74) 100%)}
+  .room-card .card-body{position:absolute;inset:auto 0 0;padding:32px 12px 12px;background:linear-gradient(0deg,rgba(5,12,8,.54),transparent);pointer-events:none}
+  .room-card .card-num{margin:0 0 4px;font-size:9px;color:#f1d47a}
+  .room-card .card-title{margin:0 0 4px;font-size:1.12rem;line-height:1.08;text-shadow:0 2px 8px rgba(0,0,0,.4)}
+  .room-card .card-theme{font-size:8px;letter-spacing:.1em;color:rgba(255,255,255,.78)}
+  #selector-outro{min-height:0;padding:34px 20px 38px}
+
+  .public-catalog{width:100%;padding:78px 0 30px}
+  .catalog-intro{margin:0;padding:0 14px 14px}
+  .catalog-intro .eyebrow{margin:0 0 7px;font-size:9px}
+  .catalog-intro h1{margin:0;font-size:2.05rem;line-height:1.04}
+  .catalog-intro p{display:none}
+  .catalog-controls{position:sticky;top:58px;z-index:500;display:flex;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none;margin:0;padding:9px 12px 10px;border:0;border-top:1px solid rgba(241,238,229,.08);border-bottom:1px solid rgba(241,238,229,.08);border-radius:0;background:rgba(14,29,21,.94);box-shadow:0 8px 20px rgba(0,0,0,.14);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+  .catalog-controls::-webkit-scrollbar{display:none}
+  .catalog-controls label{flex:0 0 128px;min-width:128px;gap:4px;scroll-snap-align:start;font-size:9px;letter-spacing:.02em}
+  .catalog-controls label:first-child{flex-basis:min(66vw,250px);min-width:min(66vw,250px)}
+  .catalog-controls .catalog-favorites-filter{flex-basis:148px;min-width:148px;min-height:38px;align-self:end;padding:0 10px;white-space:nowrap}
+  .catalog-controls input,.catalog-controls select{min-height:38px;padding:8px 10px;border-radius:10px;font-size:12px}
+  .catalog-controls .catalog-favorites-filter input{flex:0 0 18px;width:18px;min-height:18px}
+  .catalog-results-count{min-height:0;margin:11px 14px 10px;font-size:10px}
+  .public-artworks-grid{display:block;column-count:2;column-gap:11px;padding:0 12px}
+  .public-artworks-grid>.empty-message{column-span:all;margin:0 0 16px}
+  .public-artwork-card{display:inline-block;width:100%;margin:0 0 13px;break-inside:avoid;overflow:hidden;vertical-align:top;border:0;border-radius:14px;background:transparent;box-shadow:none}
+  .public-artwork-card:hover{transform:none;border-color:transparent;box-shadow:none}
+  .public-artwork-image{width:100%;height:auto;aspect-ratio:auto;object-fit:contain;border-radius:14px;background:rgba(255,255,255,.035)}
+  .public-artwork-copy{gap:4px;padding:7px 3px 3px}
+  .public-artwork-copy .eyebrow{overflow:hidden;font-size:8px;letter-spacing:.09em;text-overflow:ellipsis;white-space:nowrap}
+  .public-artwork-copy h2{font-size:1rem;line-height:1.12;letter-spacing:-.01em}
+  .public-artwork-artist{font-size:10px;line-height:1.35}
+  .public-artwork-medium{display:none}
+  .public-artwork-copy strong{margin-top:1px;font:600 11px 'Space Grotesk',sans-serif}
+  .public-artwork-status{justify-self:start;padding:3px 7px;font-size:8px}
+  .artwork-favorite{top:7px;right:7px;width:34px;height:34px;border:1px solid rgba(255,255,255,.45);background:rgba(10,18,13,.7);font-size:20px;backdrop-filter:blur(10px)}
+  .public-artwork-detail{min-height:31px;margin-top:3px;padding:4px 10px;border:0;border-radius:999px;background:rgba(224,194,106,.12);font-size:10px}
+  .catalog-pagination{padding:18px 12px 24px}
+
+  #view-category #category-content{padding-bottom:calc(82px + env(safe-area-inset-bottom))}
+  #view-category #category-artworks-grid{column-count:2;column-gap:11px;padding:0 12px}
+  #view-category .category-artwork-card{display:inline-block;width:100%;margin:0 0 13px;padding:0;break-inside:avoid;overflow:hidden;border:0;border-radius:14px;background:rgba(255,255,255,.035);vertical-align:top}
+  #view-category .category-artwork-image{display:block;width:100%;height:auto;max-height:300px;object-fit:contain;border-radius:14px 14px 0 0}
+  #view-category .category-artwork-copy{padding:8px 9px 10px}
+  #view-category .category-artwork-copy h3{font-size:1rem}
+  #view-category .category-artwork-copy p{font-size:10px;margin-bottom:7px}
+  #categories-panel{top:58px;max-height:calc(100dvh - 132px);border-radius:0 0 16px 16px}
+  .client-account-panel{top:auto;right:12px;bottom:calc(74px + env(safe-area-inset-bottom));width:min(310px,calc(100vw - 24px));border-radius:16px}
+  .admin-preview-banner{min-height:40px;padding:5px 9px;gap:8px}
+  .preview-banner-content{min-width:0;gap:0}
+  .preview-badge{padding:4px 7px;font-size:8px;letter-spacing:.04em;white-space:nowrap}
+  .preview-text{display:none}
+  .preview-return-btn{flex:0 0 auto;padding:6px 8px;font-size:9px;line-height:1.2}
+  body.has-admin-preview #main-nav{top:40px}
+  body.has-admin-preview #view-selector #selector-hero{padding-top:112px}
+  body.has-admin-preview #view-catalog .public-catalog{padding-top:130px}
+}
+@media (max-width:390px){
+  #rooms-grid,.public-artworks-grid,#view-category #category-artworks-grid{column-gap:9px;padding-right:10px;padding-left:10px}
+  .room-card .card-title{font-size:1rem}
+  .public-artwork-copy h2{font-size:.94rem}
+}
+@media (prefers-reduced-motion:reduce){.mobile-nav-item,.room-card,.public-artwork-card{scroll-behavior:auto;transition:none!important}}

@@ -111,6 +111,11 @@ function toggleClientAccountPanel(force){
     if(toggle) toggle.classList.remove('active');
   }
   if(toggle) toggle.setAttribute('aria-expanded', String(shouldOpen));
+  const mobileToggle = document.getElementById('mobile-account-toggle');
+  if(mobileToggle){
+    mobileToggle.classList.toggle('active', shouldOpen);
+    mobileToggle.setAttribute('aria-expanded', String(shouldOpen));
+  }
 }
 
 function closeClientAccountPanel(){
@@ -847,7 +852,16 @@ async function navigateToCategory(categoryId){
         artworks.forEach(art => {
           const card = document.createElement('article');
           card.className = 'category-artwork-card';
-          card.innerHTML = `<h3>${sanitizeText(art.title)}</h3><p>${sanitizeText(art.artist)} · ${sanitizeText(art.year)}</p><strong>${sanitizeText(art.price)}</strong>`;
+          const image = document.createElement('img');
+          image.className = 'category-artwork-image';
+          image.loading = 'lazy';
+          image.decoding = 'async';
+          image.alt = `Obra ${art.title}, de ${art.artist}`;
+          image.src = sanitizeImageUrl(art.imageUrl || art.room?.imageUrl) || '/images/balam-icon.svg';
+          const copy = document.createElement('div');
+          copy.className = 'category-artwork-copy';
+          copy.innerHTML = `<h3>${sanitizeText(art.title)}</h3><p>${sanitizeText(art.artist)} · ${sanitizeText(art.year)}</p><strong>${sanitizeText(art.price)}</strong>`;
+          card.append(image, copy);
           card.addEventListener('click', () => { currentHotspotData = {...art, desc: art.description, roomId: roomsData.findIndex(r => r.id === art.roomId)}; navigateToPurchase(currentHotspotData); });
           grid.appendChild(card);
         });
@@ -1028,6 +1042,7 @@ function switchView(viewName, roomIndex = null){
   const isAdminView = ['adminDashboard', 'adminLogin', 'forgotPassword', 'resetPassword'].includes(viewName);
   document.body.classList.toggle('admin-mode', isAdminView);
   document.body.classList.toggle('immersive-room', viewName === 'room');
+  document.body.classList.toggle('show-mobile-nav', ['landing', 'selector', 'catalog', 'books', 'about', 'category'].includes(viewName));
   // Asegurar que el panel de cuenta del admin nunca quede abierto al cambiar de vista
   if(typeof toggleAdminAccountPanel === 'function') toggleAdminAccountPanel(false);
   if(viewName !== 'room') elements.categoriesPanel?.classList.remove('open');
@@ -1082,11 +1097,20 @@ function switchView(viewName, roomIndex = null){
   window.scrollTo(0, 0);
 }
 
+function showPublicHome(){
+  if(window.matchMedia('(max-width: 760px)').matches){
+    renderRoomSelector();
+    switchView('selector');
+  } else {
+    switchView('landing');
+  }
+}
+
 function handleHashChange(){
   const hash = window.location.hash;
 
   if(hash === '#/' || hash === ''){
-    switchView('landing');
+    showPublicHome();
   } else if(hash === '#/selector'){
     renderRoomSelector();
     switchView('selector');
@@ -1207,6 +1231,19 @@ function updateActiveNavLink(){
   if(activeLink){
     activeLink.classList.add('active');
   }
+
+  document.querySelectorAll('.mobile-discovery-nav .mobile-nav-item[data-mobile-nav]').forEach(item => {
+    item.classList.remove('active');
+    item.removeAttribute('aria-current');
+  });
+  const mobileNav = hash.startsWith('#/categoria/') || activeNav === 'books'
+    ? 'categories'
+    : activeNav === 'catalog'
+      ? 'catalog'
+      : ['landing', 'collections'].includes(activeNav) ? 'collections' : null;
+  const activeMobileLink = mobileNav ? document.querySelector(`.mobile-discovery-nav [data-mobile-nav="${mobileNav}"]`) : null;
+  activeMobileLink?.classList.add('active');
+  activeMobileLink?.setAttribute('aria-current', 'page');
 }
 
 /* ============================================================
@@ -1286,6 +1323,9 @@ function toggleCategoriesPanel(){
       ease: 'power2.in'
     });
   }
+  const mobileToggle = document.getElementById('mobile-categories-toggle');
+  mobileToggle?.classList.toggle('active', isPanelOpen);
+  mobileToggle?.setAttribute('aria-expanded', String(isPanelOpen));
 }
 
 function closeCategoriesPanel(){
@@ -1297,6 +1337,9 @@ function closeCategoriesPanel(){
       duration: 0.3,
       ease: 'power2.in'
     });
+    const mobileToggle = document.getElementById('mobile-categories-toggle');
+    mobileToggle?.classList.remove('active');
+    mobileToggle?.setAttribute('aria-expanded', 'false');
   }
 }
 
@@ -1304,6 +1347,19 @@ function closeCategoriesPanel(){
 elements.categoriesToggle.addEventListener('click', (e) => {
   e.stopPropagation();
   toggleCategoriesPanel();
+});
+
+document.getElementById('mobile-categories-toggle')?.addEventListener('click', event => {
+  event.preventDefault();
+  event.stopPropagation();
+  toggleCategoriesPanel();
+});
+
+document.getElementById('mobile-account-toggle')?.addEventListener('click', event => {
+  event.preventDefault();
+  event.stopPropagation();
+  renderClientAccountPanel();
+  toggleClientAccountPanel();
 });
 
 // Click fuera del panel para cerrar
@@ -4549,7 +4605,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if(window.location.hash){
     handleHashChange();
   } else {
-    switchView('landing');
+    showPublicHome();
   }
   
   // Animación inicial del hero del landing

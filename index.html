@@ -68,15 +68,31 @@
         <span>Mi cuenta</span>
         <span class="chevron">▾</span>
       </button>
-      <div class="client-account-panel" id="client-account-panel">
-        <div class="client-account-header" id="client-account-logged" style="display:none;">
-          <strong id="client-account-name">Usuario</strong>
-          <span id="client-account-email">correo@ejemplo.com</span>
-        </div>
-        <div class="client-account-links" id="client-account-links"></div>
-      </div>
     </div>
   </div>
+</nav>
+
+<div class="client-account-panel" id="client-account-panel">
+  <div class="client-account-header" id="client-account-logged" style="display:none;">
+    <strong id="client-account-name">Usuario</strong>
+    <span id="client-account-email">correo@ejemplo.com</span>
+  </div>
+  <div class="client-account-links" id="client-account-links"></div>
+</div>
+
+<nav id="mobile-discovery-nav" class="mobile-discovery-nav" aria-label="Navegación móvil">
+  <a class="mobile-nav-item" href="#/selector" data-mobile-nav="collections" aria-label="Inicio, colecciones">
+    <span class="mobile-nav-icon" aria-hidden="true">⌂</span><span>Inicio</span>
+  </a>
+  <a class="mobile-nav-item" href="#/obras" data-mobile-nav="catalog" aria-label="Explorar obras">
+    <span class="mobile-nav-icon" aria-hidden="true">⌕</span><span>Explorar</span>
+  </a>
+  <button class="mobile-nav-item" id="mobile-categories-toggle" type="button" aria-controls="categories-panel" aria-expanded="false">
+    <span class="mobile-nav-icon" aria-hidden="true">◈</span><span>Categorías</span>
+  </button>
+  <button class="mobile-nav-item" id="mobile-account-toggle" type="button" aria-label="Abrir mi cuenta" aria-expanded="false">
+    <span class="mobile-nav-icon" aria-hidden="true">♙</span><span>Cuenta</span>
+  </button>
 </nav>
 
 <!-- ========== PANEL DESPLEGABLE DE CATEGORÍAS ========== -->
