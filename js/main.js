@@ -935,7 +935,7 @@ async function navigateToCategory(categoryId){
           image.loading = 'lazy';
           image.decoding = 'async';
           image.alt = `Obra ${art.title}, de ${art.artist}`;
-          image.src = sanitizeImageUrl(art.imageUrl || art.room?.imageUrl) || '/images/balam-icon.svg';
+          image.src = sanitizeImageUrl(art.imageUrl || art.room?.imageUrl) || '/images/balam-logo.jpeg';
           const copy = document.createElement('div');
           copy.className = 'category-artwork-copy';
           copy.innerHTML = `<h3>${sanitizeText(art.title)}</h3><p>${sanitizeText(art.artist)} · ${sanitizeText(art.year)}</p><strong>${sanitizeText(art.price)}</strong>`;

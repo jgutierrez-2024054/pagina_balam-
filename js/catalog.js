@@ -47,7 +47,7 @@ async function loadPublicCatalog(page = 1){
       image.className = 'public-artwork-image';
       image.loading = 'lazy'; image.decoding = 'async';
       image.alt = `Obra ${art.title}, de ${art.artist}`;
-      image.src = window.BALAM_APP.sanitizeImageUrl(art.imageUrl || art.room?.imageUrl) || '/images/balam-icon.svg';
+      image.src = window.BALAM_APP.sanitizeImageUrl(art.imageUrl || art.room?.imageUrl) || '/images/balam-logo.jpeg';
       const favorite = document.createElement('button');
       favorite.type = 'button'; favorite.className = 'artwork-favorite';
       favorite.setAttribute('aria-label', favoriteIds.has(art.id) ? `Quitar ${art.title} de favoritos` : `Agregar ${art.title} a favoritos`);
