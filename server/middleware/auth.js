@@ -2,10 +2,17 @@ const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+function readSessionCookie(req) {
+  const cookie = (req.headers.cookie || '').split(';').map(part => part.trim()).find(part => part.startsWith('balam_session='));
+  return cookie ? decodeURIComponent(cookie.slice('balam_session='.length)) : null;
+}
+
 // Middleware para verificar el JWT y confirmar que el usuario sigue existiendo.
 const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers.authorization || '';
-  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
+  // Bearer tokens remain accepted for API clients during migration. Browser sessions use HttpOnly cookies.
+  const token = bearerToken && !['null', 'undefined'].includes(bearerToken) ? bearerToken : readSessionCookie(req);
   if (!token) return res.status(401).json({ error: 'Token no proporcionado.' });
   if (!process.env.JWT_SECRET) return res.status(500).json({ error: 'JWT_SECRET no configurado en el servidor.' });
   try {

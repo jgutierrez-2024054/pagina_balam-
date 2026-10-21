@@ -166,6 +166,11 @@ const CATEGORY_PLACEHOLDERS = {
 };
 
 async function main() {
+  const adminPassword = String(process.env.ADMIN_PASSWORD || '');
+  if (adminPassword.length < 12) {
+    throw new Error('Define ADMIN_PASSWORD con al menos 12 caracteres en .env antes de ejecutar el seed.');
+  }
+
   console.log('🌱 Iniciando seed de la base de datos...');
 
   // En desarrollo se reconstruye todo; en producción el seed es seguro de repetir.
@@ -189,7 +194,7 @@ async function main() {
 
   // Crear usuario administrador
   console.log('👤 Creando usuario administrador...');
-  const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'admin123', 12);
+  const hashedPassword = await bcrypt.hash(adminPassword, 12);
   const adminUser = await prisma.user.create({
     data: {
       name: 'Administrador',
@@ -319,7 +324,10 @@ async function main() {
         id: method.id,
         label: method.label,
         icon: method.icon,
-        active: true
+        instructions: method.id === 'transfer'
+          ? 'Después de confirmar tu pedido, la galería te compartirá los datos para realizar la transferencia. El pedido se marcará como pagado cuando el equipo verifique el depósito.'
+          : null,
+        active: method.id === 'transfer'
       }
     });
   }

@@ -30,3 +30,4 @@ npm-debug.log*
 # Archivos subidos en producción/local
 /uploads/*
 !/uploads/.gitkeep
+/private-uploads/

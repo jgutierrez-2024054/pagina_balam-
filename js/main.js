@@ -218,6 +218,7 @@ function refreshClientAccount(){
 
 // Cerrar sesión del cliente
 function clientLogout(){
+  fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
   authToken = null;
   currentUser = null;
   localStorage.removeItem('authToken');
@@ -271,6 +272,11 @@ let currentResizeHandler = null; // Guardar referencia al handler de resize acti
 let authToken = null; // Token JWT para autenticación
 let currentUser = null; // Usuario actual autenticado
 let allOrders = []; // Almacenar todos los pedidos para filtrado
+let currentAdminOrderFilters = {};
+let adminOrdersPage = 0;
+let adminOrdersTotal = 0;
+let myOrdersPage = 0;
+let myOrdersTotal = 0;
 let currentEditingRoom = null; // Sala actual en el editor de hotspots
 let editingHotspots = []; // Hotspots en edición
 
@@ -415,6 +421,7 @@ const views = {
   clientRegister: document.getElementById('view-client-register'),
   adminDashboard: document.getElementById('view-admin-dashboard'),
   books: document.getElementById('view-books'),
+  catalog: document.getElementById('view-catalog'),
   about: document.getElementById('view-about'),
   category: document.getElementById('view-category'),
   clientLogin: document.getElementById('view-client-login'),
@@ -529,6 +536,8 @@ function renderBooks(){
       
       const cover = document.createElement('div');
       cover.className = 'book-cover';
+      cover.setAttribute('role', 'img');
+      cover.setAttribute('aria-label', `Portada: ${book.title}`);
       // Usar gradiente por defecto ya que no tenemos palette en la API
       cover.style.backgroundImage = sanitizeImageUrl(book.coverUrl) ? `url("${sanitizeImageUrl(book.coverUrl)}")` : 'radial-gradient(120% 140% at 20% 15%, #c9a227, transparent 60%), radial-gradient(140% 160% at 80% 90%, #2a3d2e, transparent 65%), linear-gradient(160deg, #ede4dd, #2a3d2e)';
       cover.style.backgroundSize = 'cover';
@@ -541,6 +550,7 @@ function renderBooks(){
         <div class="author">${sanitizeText(book.author)}</div>
         <div class="year">${sanitizeText(book.year)}</div>
         <div class="price">${sanitizeText(book.price)}</div>
+        <div class="year">${book.stock > 0 ? `${book.stock} disponibles` : 'Agotado'}</div>
       `;
       
       card.appendChild(cover);
@@ -548,7 +558,7 @@ function renderBooks(){
       
       card.addEventListener('click', () => {
         currentHotspotData = {...book, isBook: true};
-        navigateToPurchase(book);
+        navigateToPurchase(currentHotspotData);
       });
       
       elements.booksGrid.appendChild(card);
@@ -858,11 +868,7 @@ async function navigateToCategory(categoryId){
    ============================================================ */
 
 function navigateToPurchase(data){
-  // Verificar si hay sesión iniciada
-  authToken = localStorage.getItem('authToken');
-  currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-  
-  if (!authToken || !currentUser) {
+  if (!currentUser) {
     // Guardar el item pendiente para redirigir después del login
     localStorage.setItem('pendingPurchase', JSON.stringify(data));
     
@@ -889,9 +895,9 @@ function navigateToPurchase(data){
   document.getElementById('purchase-year').textContent = data.year;
   document.getElementById('purchase-medium').textContent = isBook ? 'Libro/Catálogo' : data.medium;
   document.getElementById('purchase-dims').textContent = isBook ? 'Varía según edición' : data.dims;
-  document.getElementById('purchase-avail').textContent = data.status === 'SOLD' ? 'Vendida' : data.status === 'RESERVED' ? 'Reservada' : 'Disponible';
+  document.getElementById('purchase-avail').textContent = isBook ? (data.stock > 0 ? `${data.stock} disponibles` : 'Agotado') : data.status === 'SOLD' ? 'Vendida' : data.status === 'RESERVED' ? 'Reservada' : 'Disponible';
   document.getElementById('purchase-desc').textContent = data.desc || data.description || '';
-  if(data.status === 'SOLD' || data.status === 'RESERVED'){ elements.confirmPurchase.disabled = true; elements.confirmPurchase.textContent = data.status === 'SOLD' ? 'Obra vendida' : 'Obra reservada'; } else { elements.confirmPurchase.disabled = false; elements.confirmPurchase.textContent = 'Confirmar interés'; }
+  if(data.status === 'SOLD' || data.status === 'RESERVED' || (isBook && data.stock < 1)){ elements.confirmPurchase.disabled = true; elements.confirmPurchase.textContent = isBook ? 'Agotado' : data.status === 'SOLD' ? 'Obra vendida' : 'Obra reservada'; } else { elements.confirmPurchase.disabled = false; elements.confirmPurchase.textContent = 'Confirmar interés'; }
   document.getElementById('purchase-price').textContent = data.price;
   
   // Configurar visual
@@ -916,6 +922,8 @@ function navigateToPurchase(data){
 
 function renderPaymentOptions(){
   elements.paymentOptions.innerHTML = '';
+  const instructions = document.getElementById('payment-instructions');
+  if (instructions) instructions.textContent = 'Elige un método para ver las instrucciones.';
   
   const methods = paymentMethodsData.length ? paymentMethodsData : [];
   methods.forEach(method => {
@@ -926,11 +934,16 @@ function renderPaymentOptions(){
       <label for="payment-${method.id}">${sanitizeText(method.icon)} ${sanitizeText(method.label)}</label>
     `;
     
-    option.onclick = () => {
+    const selectOption = () => {
       document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
       option.classList.add('selected');
       option.querySelector('input').checked = true;
+      if (instructions) instructions.textContent = method.instructions || (method.id === 'transfer'
+        ? 'Transferencia manual: la galería confirmará contigo los datos de pago después de recibir tu pedido. No se marca como pagado hasta verificar la transferencia.'
+        : 'El pedido quedará pendiente de confirmación por parte de la galería.');
     };
+    option.onclick = selectOption;
+    option.querySelector('input').addEventListener('change', selectOption);
     
     elements.paymentOptions.appendChild(option);
   });
@@ -938,7 +951,7 @@ function renderPaymentOptions(){
 
 async function confirmPurchaseInterest(){
   // Una compra no puede completarse sin sesión, incluso al volver con el historial.
-  if (!authToken || !currentUser) {
+  if (!currentUser) {
     if (currentHotspotData) localStorage.setItem('pendingPurchase', JSON.stringify(currentHotspotData));
     showToast('Inicia sesión o crea una cuenta para continuar con la compra.', 'error');
     switchView('clientLogin');
@@ -986,9 +999,12 @@ async function confirmPurchaseInterest(){
     }
     
     // Mostrar modal de confirmación
+    trackAnalytics('ORDER_STARTED', itemId);
     const folio = data.id.slice(0, 8);
     document.getElementById('confirmation-folio').textContent = folio;
-    document.getElementById('confirmation-payment').textContent = method.label;
+    document.getElementById('confirmation-payment').textContent = `${method.label} · Pendiente de confirmación manual`;
+    const nextSteps = document.getElementById('confirmation-next-steps');
+    if (nextSteps) nextSteps.textContent = method.instructions || 'La galería te compartirá los datos para transferir. El pedido no queda pagado hasta que el equipo verifique el depósito.';
     
     const modal = document.getElementById('confirmation-modal');
     modal.style.display = 'flex';
@@ -1047,6 +1063,8 @@ function switchView(viewName, roomIndex = null){
     history.pushState(null, '', '#/');
   } else if(viewName === 'selector'){
     history.pushState(null, '', '#/selector');
+  } else if(viewName === 'catalog'){
+    history.pushState(null, '', '#/obras');
   } else if(viewName === 'adminDashboard'){
     history.pushState(null, '', '#admin-dashboard');
   } else if(viewName === 'room' && roomIndex !== null){
@@ -1075,23 +1093,25 @@ function handleHashChange(){
   } else if(hash === '#/libros'){
     renderBooks();
     switchView('books');
+  } else if(hash === '#/obras'){
+    loadPublicCatalog();
+    switchView('catalog');
   } else if(hash === '#/nosotros'){
     loadAboutContent();
     switchView('about');
   } else if(hash === '#admin-login'){
     switchView('adminLogin');
   } else if(hash === '#admin-dashboard' || hash.startsWith('#admin-dashboard?')){
-    authToken = localStorage.getItem('authToken');
-    currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-    if(!authToken || !currentUser || currentUser.role !== 'ADMIN'){
-      switchView('adminLogin');
-    } else {
+    const openDashboard = user => {
+      if(!user || user.role !== 'ADMIN') { switchView('adminLogin'); return; }
+      currentUser = user;
       switchView('adminDashboard');
       loadAdminDashboard();
       const urlParams = new URLSearchParams(hash.split('?')[1] || '');
       const tab = urlParams.get('tab');
       if(tab) switchAdminTab(tab);
-    }
+    };
+    fetch('/api/auth/verify').then(response => response.ok ? response.json() : null).then(data => openDashboard(data?.user)).catch(() => openDashboard(null));
   } else if(hash === '#forgot-password'){
     switchView('forgotPassword');
   } else if(hash === '#reset-password'){
@@ -1174,6 +1194,8 @@ function updateActiveNavLink(){
   let activeNav = 'landing';
   if(hash === '#/selector' || hash.startsWith('#/sala/') || hash.startsWith('#/obra/')){
     activeNav = 'collections';
+  } else if(hash === '#/obras'){
+    activeNav = 'catalog';
   } else if(hash === '#/libros' || hash.startsWith('#/libro/')){
     activeNav = 'books';
   } else if(hash === '#/nosotros'){
@@ -1192,10 +1214,12 @@ function updateActiveNavLink(){
    ============================================================ */
 
 function openModal(data){
+  if (data?.id) trackAnalytics('ARTWORK_VIEW', String(data.id));
   // Llenar datos del modal
-  document.getElementById('m-canvas').style.backgroundImage = data.palette
+  const modalImage = sanitizeImageUrl(data.imageUrl || data.image || data.coverUrl);
+  document.getElementById('m-canvas').style.backgroundImage = modalImage ? `url("${modalImage}")` : (data.palette
     ? gradientFor(data.palette)
-    : 'linear-gradient(160deg, rgba(201,162,39,0.22), rgba(20,26,22,0.9))';
+    : 'linear-gradient(160deg, rgba(201,162,39,0.22), rgba(20,26,22,0.9))');
   document.getElementById('m-canvas').style.backgroundSize = 'cover';
   document.getElementById('m-canvas').style.backgroundPosition = 'center';
   
@@ -1207,6 +1231,9 @@ function openModal(data){
   document.getElementById('m-dims').textContent = data.dims;
   document.getElementById('m-desc').textContent = data.desc;
   document.getElementById('m-price').textContent = data.price;
+  const buyButton = document.getElementById('m-buy-btn');
+  buyButton.disabled = data.status === 'SOLD' || data.status === 'RESERVED';
+  buyButton.textContent = data.status === 'SOLD' ? 'Obra vendida' : data.status === 'RESERVED' ? 'Obra reservada' : 'Comprar';
   
   elements.modalBackdrop.classList.add('open');
   gsap.fromTo(elements.modalBackdrop, 
@@ -1373,19 +1400,140 @@ elements.categoryBackBtn.addEventListener('click', () => switchView('selector'))
 
 let currentAdminTab = 'overview';
 let allArtworksCache = [];
+let adminOrdersSeenTotal = null;
+let adminOrderNotificationCount = 0;
+let adminOrderNotificationTimer = null;
+let adminOrderNotificationRequest = false;
+let adminOrderVisibilityHandlerBound = false;
+const ADMIN_ORDERS_LAST_VIEWED_KEY = 'balam-admin-last-viewed-orders-total';
+
+function rememberAdminOrdersViewed(total){
+  try { localStorage.setItem(ADMIN_ORDERS_LAST_VIEWED_KEY, String(Math.max(0, Number(total) || 0))); }
+  catch (_) { /* La notificación en memoria sigue funcionando si el almacenamiento está bloqueado. */ }
+}
+
+function restoreAdminOrderNotifications(total){
+  const currentTotal = Math.max(0, Number(total) || 0);
+  adminOrdersSeenTotal = currentTotal;
+  adminOrdersTotal = currentTotal;
+  let previousTotal = null;
+  try {
+    const saved = localStorage.getItem(ADMIN_ORDERS_LAST_VIEWED_KEY);
+    if(saved !== null && Number.isSafeInteger(Number(saved)) && Number(saved) >= 0) previousTotal = Number(saved);
+  } catch (_) { /* Se usa el total actual como primera referencia. */ }
+
+  if(previousTotal === null){
+    adminOrderNotificationCount = 0;
+    rememberAdminOrdersViewed(currentTotal);
+  } else {
+    adminOrderNotificationCount = Math.max(0, currentTotal - previousTotal);
+    if(previousTotal > currentTotal) rememberAdminOrdersViewed(currentTotal);
+  }
+  renderAdminOrderNotification(adminOrderNotificationCount > 0);
+}
+
+function renderAdminOrderNotification(animate = false){
+  const badge = document.getElementById('admin-order-notification');
+  const tab = document.getElementById('admin-tab-button-orders');
+  if(!badge || !tab) return;
+
+  const count = Math.max(0, adminOrderNotificationCount);
+  badge.hidden = count === 0;
+  badge.textContent = count > 99 ? '99+' : String(count);
+  tab.classList.toggle('has-notifications', count > 0);
+  if(count > 0){
+    tab.setAttribute('aria-label', `Pedidos y ventas, ${count} pedido${count === 1 ? '' : 's'} nuevo${count === 1 ? '' : 's'}`);
+    if(animate){
+      badge.classList.remove('is-pinging');
+      void badge.offsetWidth;
+      badge.classList.add('is-pinging');
+    }
+  } else {
+    tab.removeAttribute('aria-label');
+    badge.classList.remove('is-pinging');
+  }
+}
+
+function clearAdminOrderNotifications(){
+  adminOrderNotificationCount = 0;
+  if(Number.isFinite(adminOrdersTotal)){
+    adminOrdersSeenTotal = adminOrdersTotal;
+    rememberAdminOrdersViewed(adminOrdersTotal);
+  }
+  renderAdminOrderNotification();
+}
+
+async function pollAdminOrderNotifications(){
+  if(adminOrderNotificationRequest || currentUser?.role !== 'ADMIN' || adminOrdersSeenTotal === null) return;
+  adminOrderNotificationRequest = true;
+  try {
+    const response = await fetch('/api/orders?all=1&page=1&pageSize=1', {
+      cache: 'no-store',
+      headers: { Authorization: `Bearer ${authToken}` }
+    });
+    if(response.status === 401 || response.status === 403){
+      clearInterval(adminOrderNotificationTimer);
+      adminOrderNotificationTimer = null;
+      return;
+    }
+    if(!response.ok) return;
+    const result = await response.json();
+    const total = Number(result.total);
+    if(!Number.isSafeInteger(total) || total < 0) return;
+
+    const incoming = total - adminOrdersSeenTotal;
+    adminOrdersSeenTotal = total;
+    adminOrdersTotal = total;
+    if(incoming > 0){
+      adminOrderNotificationCount += incoming;
+      renderAdminOrderNotification(true);
+    }
+  } catch (error) {
+    // Las notificaciones son complementarias; una caída temporal no afecta el panel.
+    console.warn('No se pudo actualizar el indicador de pedidos nuevos.', error);
+  } finally {
+    adminOrderNotificationRequest = false;
+  }
+}
+
+function startAdminOrderNotifications(){
+  clearInterval(adminOrderNotificationTimer);
+  adminOrderNotificationTimer = setInterval(pollAdminOrderNotifications, 15000);
+  if(!adminOrderVisibilityHandlerBound){
+    document.addEventListener('visibilitychange', () => {
+      if(document.visibilityState === 'visible') pollAdminOrderNotifications();
+    });
+    adminOrderVisibilityHandlerBound = true;
+  }
+}
+
+function stopAdminOrderNotifications(){
+  clearInterval(adminOrderNotificationTimer);
+  adminOrderNotificationTimer = null;
+  adminOrdersSeenTotal = null;
+  adminOrderNotificationCount = 0;
+  renderAdminOrderNotification();
+}
 
 // Función para cambiar de pestaña en el ecosistema de administración
 function switchAdminTab(tabName){
+  const tab = document.querySelector(`.admin-tab-btn[data-tab="${CSS.escape(tabName)}"]`);
+  if (!tab) return;
   currentAdminTab = tabName;
   document.querySelectorAll('.admin-tab-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === tabName);
+    btn.setAttribute('aria-selected', String(btn.dataset.tab === tabName));
+    btn.tabIndex = btn.dataset.tab === tabName ? 0 : -1;
   });
   document.querySelectorAll('.admin-tab-panel').forEach(panel => {
-    panel.classList.toggle('active', panel.id === `admin-tab-${tabName}`);
+    const active = panel.id === `admin-tab-${tabName}`;
+    panel.classList.toggle('active', active);
+    panel.hidden = !active;
   });
   
   if(tabName === 'overview') {
     loadBillingSummary();
+    loadAnalyticsSummary();
   } else if(tabName === 'rooms') {
     loadRoomsList();
   } else if(tabName === 'artworks') {
@@ -1397,7 +1545,13 @@ function switchAdminTab(tabName){
   } else if(tabName === 'payments') {
     loadPaymentMethodsList();
   } else if(tabName === 'orders') {
-    loadOrdersList(allOrders);
+    const refreshNewOrders = adminOrderNotificationCount > 0;
+    clearAdminOrderNotifications();
+    if(refreshNewOrders){
+      loadAdminOrdersPage(true).catch(error => showToast(error.message, 'error'));
+    } else {
+      loadOrdersList(allOrders, currentAdminOrderFilters);
+    }
     loadSalesHistory();
   } else if(tabName === 'about') {
     loadAboutAdminPreview();
@@ -1426,10 +1580,8 @@ async function adminLogin(email, password){
       throw new Error('Esta cuenta no tiene permisos de administrador.');
     }
 
-    // Guardar token y usuario
-    authToken = data.token;
+    authToken = null;
     currentUser = data.user;
-    localStorage.setItem('authToken', data.token);
     localStorage.setItem('currentUser', JSON.stringify(data.user));
 
     elements.loginError.style.display = 'none';
@@ -1446,7 +1598,7 @@ async function adminLogin(email, password){
 
 // Función para cargar el dashboard de administración
 async function loadAdminDashboard(){
-  if (!authToken) {
+  if (!currentUser || currentUser.role !== 'ADMIN') {
     switchView('adminLogin');
     return;
   }
@@ -1482,8 +1634,7 @@ async function loadAdminDashboard(){
     loadBillingSummary();
 
     // Almacenar pedidos para filtrado
-    const allOrdersResponse = await fetch('/api/orders?all=1', { headers: { Authorization: `Bearer ${authToken}` } });
-    allOrders = allOrdersResponse.ok ? await allOrdersResponse.json() : (data.recentOrders || []);
+    await loadAdminOrdersPage(true);
 
     // Cargar la pestaña activa
     switchAdminTab(currentAdminTab);
@@ -1496,6 +1647,26 @@ async function loadAdminDashboard(){
     }
   }
 }
+
+async function loadAdminOrdersPage(reset = false){
+  const button = document.getElementById('admin-orders-load-more');
+  if(reset){ allOrders = []; adminOrdersPage = 0; }
+  const page = adminOrdersPage + 1;
+  const response = await fetch(`/api/orders?all=1&page=${page}&pageSize=100`, { headers: { Authorization: `Bearer ${authToken}` } });
+  const result = await response.json();
+  if(!response.ok) throw new Error(result.error || 'No se pudieron cargar los pedidos.');
+  allOrders = reset ? (result.items || []) : allOrders.concat(result.items || []);
+  adminOrdersPage = result.page;
+  adminOrdersTotal = result.total;
+  if(reset){
+    restoreAdminOrderNotifications(result.total);
+    startAdminOrderNotifications();
+  }
+  if(button){ button.style.display = allOrders.length < adminOrdersTotal ? 'inline-flex' : 'none'; button.textContent = `Cargar más pedidos (${adminOrdersTotal - allOrders.length})`; }
+  if(currentAdminTab === 'orders') loadOrdersList(allOrders, currentAdminOrderFilters);
+}
+
+document.getElementById('admin-orders-load-more')?.addEventListener('click', () => loadAdminOrdersPage().catch(error => showToast(error.message, 'error')));
 
 async function loadBillingSummary(){
   const container = document.getElementById('billing-summary');
@@ -1518,6 +1689,26 @@ async function loadBillingSummary(){
       <div class="billing-total"><span>Ingresos cobrados</span><strong>${money(data.totals.revenue)}</strong><p>${data.totals.paidOrders} venta${data.totals.paidOrders === 1 ? '' : 's'} confirmada${data.totals.paidOrders === 1 ? '' : 's'} · ${data.totals.allMonthOrders} pedido${data.totals.allMonthOrders === 1 ? '' : 's'} registrado${data.totals.allMonthOrders === 1 ? '' : 's'}</p></div>
       <div class="billing-breakdown"><h3>Por método de pago</h3>${paymentRows}</div>
       <div class="billing-items"><h3>Ventas por catálogo</h3><div>${itemRows}</div><p>${customers} cliente${customers === 1 ? '' : 's'} atendido${customers === 1 ? '' : 's'} este mes.</p></div>`;
+  } catch (error) {
+    container.innerHTML = `<p class="admin-empty-state">${sanitizeText(error.message)}</p>`;
+  }
+}
+
+async function loadAnalyticsSummary(){
+  const container = document.getElementById('analytics-summary');
+  if (!container) return;
+  try {
+    const response = await fetch('/api/admin/analytics?days=30', { headers: { Authorization: `Bearer ${authToken}` } });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'No se pudieron cargar las métricas.');
+    const counts = Object.fromEntries((data.byEvent || []).map(item => [item.eventKey, item.count]));
+    const eventCards = [
+      ['Búsquedas', counts.SEARCH || 0],
+      ['Obras consultadas', counts.ARTWORK_VIEW || 0],
+      ['Pedidos iniciados', counts.ORDER_STARTED || 0]
+    ].map(([label, count]) => `<div class="analytics-stat"><span>${label}</span><strong>${count}</strong></div>`).join('');
+    const topItems = (data.mostViewed || []).map(item => `<li><span>${sanitizeText(item.artwork?.title || 'Obra eliminada')}</span><strong>${item.count} vistas</strong></li>`).join('') || '<li>Aún no hay consultas registradas.</li>';
+    container.innerHTML = `<div class="analytics-stats">${eventCards}</div><div class="analytics-top"><h3>Obras más consultadas</h3><ol>${topItems}</ol><p>Se cuentan acciones, no se guardan los términos buscados ni datos de cuenta.</p></div>`;
   } catch (error) {
     container.innerHTML = `<p class="admin-empty-state">${sanitizeText(error.message)}</p>`;
   }
@@ -1701,6 +1892,10 @@ async function loadBooksList(){
             <h3>${sanitizeText(book.title)}</h3>
             <div class="author">${sanitizeText(book.author)} (${sanitizeText(book.year)})</div>
             <div class="price">${sanitizeText(book.price)}</div>
+            <div class="quick-stock-control" aria-label="Inventario de ${sanitizeText(book.title)}">
+              <span>Existencias: <strong>${book.stock}</strong></span>
+              <div><button type="button" aria-label="Restar una existencia" onclick="adjustBookStock('${book.id}', -1)" ${book.stock < 1 ? 'disabled' : ''}>−</button><button type="button" aria-label="Sumar una existencia" onclick="adjustBookStock('${book.id}', 1)">+</button></div>
+            </div>
           </div>
           <div class="room-card-footer">
             <div class="admin-list-item-actions">
@@ -1716,6 +1911,20 @@ async function loadBooksList(){
     if(elements.booksList) elements.booksList.innerHTML = '<p class="error">Error al cargar libros.</p>';
   }
 }
+
+window.adjustBookStock = async function(bookId, delta){
+  try {
+    const response = await fetch(`/api/books/${bookId}/stock-adjustment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+      body: JSON.stringify({ delta })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'No se pudo actualizar el inventario.');
+    showToast(`Inventario actualizado: ${data.stock} ejemplar${data.stock === 1 ? '' : 'es'}.`);
+    await loadBooksList();
+  } catch (error) { showToast(error.message, 'error'); }
+};
 
 // Función para cargar lista de categorías
 async function loadCategoriesList(){
@@ -1809,6 +2018,7 @@ window.togglePaymentMethodActive = async function(id, newActiveState) {
       body: JSON.stringify({
         label: current.label,
         icon: current.icon,
+        instructions: current.instructions,
         active: newActiveState
       })
     });
@@ -1918,7 +2128,7 @@ async function loadSalesHistory(){
 
 // Función para cargar lista de pedidos
 function loadOrdersList(orders, filters = {}){
-  const { status, dateFrom, dateTo } = filters;
+  const { status, dateFrom, dateTo, search } = filters;
   
   let filteredOrders = orders || [];
   
@@ -1935,6 +2145,15 @@ function loadOrdersList(orders, filters = {}){
     const toDate = new Date(dateTo);
     toDate.setHours(23, 59, 59, 999);
     filteredOrders = filteredOrders.filter(order => new Date(order.createdAt) <= toDate);
+  }
+
+  if (search) {
+    const query = search.trim().toLocaleLowerCase('es');
+    filteredOrders = filteredOrders.filter(order => {
+      const item = order.artwork || order.book;
+      return [order.id, order.user?.name, order.user?.email, item?.title, item?.artist, item?.author]
+        .some(value => String(value || '').toLocaleLowerCase('es').includes(query));
+    });
   }
   
   const container = document.getElementById('orders-list');
@@ -1985,6 +2204,7 @@ function loadOrdersList(orders, filters = {}){
           </div>
         </div>
         <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--line); display:flex; justify-content:flex-end;">
+          ${order.paymentProof ? `<a class="proof-link admin-proof-link" href="/api/orders/${encodeURIComponent(order.id)}/payment-proof" target="_blank" rel="noopener">Ver comprobante recibido</a>` : ''}
           <button onclick="viewOrder('${order.id}')" class="admin-btn">Ver Detalle & Cambiar Estado</button>
         </div>
       </div>
@@ -1994,15 +2214,27 @@ function loadOrdersList(orders, filters = {}){
 
 // Función para cerrar sesión del administrador
 function adminLogout(){
+  fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+  stopAdminOrderNotifications();
   authToken = null;
   currentUser = null;
-  localStorage.removeItem('authToken');
   localStorage.removeItem('currentUser');
   document.body.classList.remove('admin-mode', 'has-admin-preview');
   const previewBanner = document.getElementById('admin-preview-banner');
   if(previewBanner) previewBanner.style.display = 'none';
   switchView('landing');
   showToast('Has cerrado la sesión de administración.');
+}
+
+function trackAnalytics(eventKey, itemId = null){
+  try {
+    let visitorId = sessionStorage.getItem('balam-analytics-session');
+    if (!visitorId) {
+      visitorId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`;
+      sessionStorage.setItem('balam-analytics-session', visitorId);
+    }
+    fetch('/api/analytics', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ eventKey, visitorId, itemId }), keepalive: true }).catch(() => {});
+  } catch (_) { /* métricas opcionales; no deben bloquear navegación */ }
 }
 
 // Event listener para formulario de login de administrador
@@ -2031,21 +2263,18 @@ elements.backToHome.addEventListener('click', () => switchView('landing'));
 
 // Verificar si hay sesión guardada al cargar
 window.addEventListener('load', async () => {
-  const savedToken = localStorage.getItem('authToken');
-  const savedUser = localStorage.getItem('currentUser');
-  if(savedToken && savedUser){
-    try {
-      const response = await fetch('/api/auth/verify', { headers: { Authorization: `Bearer ${savedToken}` } });
-      if(!response.ok) throw new Error('Sesión inválida');
-      const data = await response.json();
-      authToken = savedToken;
-      currentUser = data.user;
-      localStorage.setItem('currentUser', JSON.stringify(data.user));
-    } catch(_) {
-      authToken = null; currentUser = null;
-      localStorage.removeItem('authToken'); localStorage.removeItem('currentUser');
-    }
+  try {
+    const response = await fetch('/api/auth/verify');
+    if(!response.ok) throw new Error('Sesión inválida');
+    const data = await response.json();
+    currentUser = data.user;
+    localStorage.setItem('currentUser', JSON.stringify(data.user));
+  } catch(_) {
+    authToken = null; currentUser = null;
+    localStorage.removeItem('currentUser');
   }
+  localStorage.removeItem('authToken');
+  if(window.location.hash === '#admin-dashboard' || window.location.hash.startsWith('#admin-dashboard?')) handleHashChange();
 });
 
 /* ============================================================
@@ -2069,10 +2298,8 @@ async function clientRegister(name, email, password, phone, address){
       throw new Error(data.error || 'Error al registrarse');
     }
 
-    // Guardar token y usuario
-    authToken = data.token;
+    authToken = null;
     currentUser = data.user;
-    localStorage.setItem('authToken', data.token);
     localStorage.setItem('currentUser', JSON.stringify(data.user));
 
     elements.registerError.style.display = 'none';
@@ -2108,10 +2335,8 @@ async function clientLogin(email, password){
       throw new Error(data.error || 'Error al iniciar sesión');
     }
 
-    // Guardar token y usuario
-    authToken = data.token;
+    authToken = null;
     currentUser = data.user;
-    localStorage.setItem('authToken', data.token);
     localStorage.setItem('currentUser', JSON.stringify(data.user));
 
     elements.clientLoginError.style.display = 'none';
@@ -2323,7 +2548,7 @@ document.getElementById('forgot-password-link').addEventListener('click', (e) =>
 
 // Función para cargar pedidos del cliente
 async function loadMyOrders(){
-  if (!authToken) {
+  if (!currentUser) {
     switchView('clientLogin');
     return;
   }
@@ -2332,19 +2557,25 @@ async function loadMyOrders(){
   elements.ordersLoading.innerHTML = '<div class="loading-container"><div class="loading-spinner"></div><div class="loading-text">Cargando pedidos...</div></div>';
   elements.ordersEmpty.style.display = 'none';
   elements.ordersListContainer.style.display = 'none';
+  myOrdersPage = 0; myOrdersTotal = 0; elements.ordersListContainer.replaceChildren();
+  const loadMoreButton = document.getElementById('my-orders-load-more');
+  if(loadMoreButton) loadMoreButton.style.display = 'none';
 
   try {
-    const response = await fetch('/api/orders', {
+    const response = await fetch('/api/orders?page=1&pageSize=20', {
       headers: {
         'Authorization': `Bearer ${authToken}`
       }
     });
 
-    const orders = await response.json();
+    const result = await response.json();
 
     if (!response.ok) {
-      throw new Error(orders.error || 'Error al cargar pedidos');
+      throw new Error(result.error || 'Error al cargar pedidos');
     }
+    const orders = result.items || [];
+    myOrdersPage = result.page; myOrdersTotal = result.total;
+    if(loadMoreButton) loadMoreButton.style.display = orders.length < myOrdersTotal ? 'inline-flex' : 'none';
 
     elements.ordersLoading.style.display = 'none';
 
@@ -2363,8 +2594,8 @@ async function loadMyOrders(){
 }
 
 // Función para renderizar lista de pedidos
-function renderOrdersList(orders){
-  elements.ordersListContainer.innerHTML = orders.map(order => {
+function renderOrdersList(orders, append = false){
+  const markup = orders.map(order => {
     const item = order.artwork || order.book;
     const itemType = order.artwork ? 'Obra' : 'Libro';
     const statusLabels = {
@@ -2397,10 +2628,55 @@ function renderOrdersList(orders){
           <div class="order-price">${sanitizeText(order.priceAtPurchase)}</div>
           <div class="order-date">${new Date(order.createdAt).toLocaleDateString('es-GT')}</div>
         </div>
+        <div class="order-proof-actions">
+          ${order.paymentProof ? `<a class="proof-link" href="/api/orders/${encodeURIComponent(order.id)}/payment-proof" target="_blank" rel="noopener">Comprobante adjunto · ${sanitizeText(order.paymentProof.originalName)}</a>` : ''}
+          ${order.paymentMethod === 'transfer' && ['PENDING', 'CONFIRMED'].includes(order.status) ? `<label class="proof-upload-label" for="payment-proof-${order.id}">Adjuntar comprobante <input class="payment-proof-input" id="payment-proof-${order.id}" data-order-id="${sanitizeText(order.id)}" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" aria-label="Adjuntar comprobante de transferencia para el pedido ${order.id.slice(0,8)}"></label>` : ''}
+          ${order.paymentMethod === 'transfer' ? '<small>El equipo revisará el comprobante y confirmará el pago manualmente.</small>' : ''}
+        </div>
       </div>
     `;
   }).join('');
+  if(append) elements.ordersListContainer.insertAdjacentHTML('beforeend', markup);
+  else elements.ordersListContainer.innerHTML = markup;
 }
+
+elements.ordersListContainer.addEventListener('change', async event => {
+  const input = event.target.closest('.payment-proof-input');
+  const file = input?.files?.[0];
+  const orderId = input?.dataset.orderId;
+  if (!file || !orderId) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('El comprobante debe pesar 5 MB o menos.', 'error'); input.value = ''; return; }
+  try {
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('No se pudo leer el archivo.'));
+      reader.readAsDataURL(file);
+    });
+    const response = await fetch(`/api/orders/${encodeURIComponent(orderId)}/payment-proof`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dataUrl, fileName: file.name })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'No se pudo enviar el comprobante.');
+    showToast('Comprobante enviado. La galería verificará la transferencia.');
+    await loadMyOrders();
+  } catch (error) { showToast(error.message, 'error'); }
+  finally { input.value = ''; }
+});
+
+document.getElementById('my-orders-load-more')?.addEventListener('click', async () => {
+  const button = document.getElementById('my-orders-load-more');
+  button.disabled = true;
+  try {
+    const result = await fetch(`/api/orders?page=${myOrdersPage + 1}&pageSize=20`, { headers: { Authorization: `Bearer ${authToken}` } }).then(response => response.json());
+    if(!result.items) throw new Error(result.error || 'No se pudieron cargar más pedidos.');
+    myOrdersPage = result.page;
+    renderOrdersList(result.items, true);
+    button.style.display = myOrdersPage * result.pageSize < myOrdersTotal ? 'inline-flex' : 'none';
+  } catch(error){ showToast(error.message, 'error'); }
+  finally { button.disabled = false; }
+});
 
 // Event listeners para navegación de pedidos
 elements.backToHomeFromOrders.addEventListener('click', () => switchView('landing'));
@@ -2596,6 +2872,7 @@ document.getElementById('add-book-form').addEventListener('submit', async (e) =>
   const formData = new FormData(e.target);
   const data = Object.fromEntries(formData.entries());
   delete data['book-cover-file'];
+  data.stock = Number(data.stock);
   try {
     const uploaded = await uploadImageFile(document.getElementById('book-cover-file').files[0]);
     if(uploaded) data.coverUrl = uploaded;
@@ -2635,6 +2912,7 @@ window.editBook = async function(bookId){
     document.getElementById('book-author').value=book.author || '';
     document.getElementById('book-year').value=book.year || '';
     document.getElementById('book-price').value=book.price || '';
+    document.getElementById('book-stock').value=book.stock ?? 0;
     document.getElementById('book-description').value=book.description || '';
     document.getElementById('book-cover').value=book.coverUrl || '';
     document.getElementById('book-cover-file').value='';
@@ -2727,6 +3005,7 @@ document.getElementById('add-artwork-form').addEventListener('submit', async (e)
   
   const formData = new FormData(e.target);
   const data = Object.fromEntries(formData.entries());
+  delete data['artwork-image-file'];
   const artworkId = document.getElementById('artwork-id').value;
   
   // Convertir valores numéricos
@@ -2746,6 +3025,8 @@ document.getElementById('add-artwork-form').addEventListener('submit', async (e)
   }
   
   try {
+    const uploadedImage = await uploadImageFile(document.getElementById('artwork-image-file').files[0]);
+    if(uploadedImage) data.imageUrl = uploadedImage;
     const response = await fetch(url, {
       method: method,
       headers: {
@@ -2796,6 +3077,8 @@ window.editArtwork = async function(artworkId) {
     document.getElementById('artwork-dims').value = artwork.dims || '';
     document.getElementById('artwork-price').value = artwork.price;
     document.getElementById('artwork-description').value = artwork.description || '';
+    document.getElementById('artwork-image-url').value = artwork.imageUrl || '';
+    document.getElementById('artwork-image-file').value = '';
     document.getElementById('artwork-category').value = artwork.categoryId || '';
     document.getElementById('artwork-status').value = artwork.status || 'AVAILABLE';
     document.getElementById('artwork-hotspot-left').value = artwork.hotspotLeft || '';
@@ -3068,6 +3351,7 @@ window.editPaymentMethod = async function(paymentMethodId) {
     document.getElementById('payment-method-id').value = method.id;
     document.getElementById('payment-method-label').value = method.label;
     document.getElementById('payment-method-icon').value = method.icon;
+    document.getElementById('payment-method-instructions').value = method.instructions || '';
     document.getElementById('payment-method-active').checked = method.active;
     
     const modal = document.getElementById('add-payment-method-modal');
@@ -3254,14 +3538,16 @@ document.getElementById('apply-filters')?.addEventListener('click', () => {
   const status = document.getElementById('filter-status')?.value;
   const dateFrom = document.getElementById('filter-date-from')?.value;
   const dateTo = document.getElementById('filter-date-to')?.value;
+  const search = document.getElementById('filter-order-search')?.value;
   
   const filters = {
     status: status || null,
     dateFrom: dateFrom || null,
-    dateTo: dateTo || null
+    dateTo: dateTo || null,
+    search: search || null
   };
-  
-  loadOrdersList(allOrders, filters);
+  currentAdminOrderFilters = filters;
+  loadOrdersList(allOrders, currentAdminOrderFilters);
 });
 
 // Event listener para limpiar filtros de pedidos
@@ -3269,8 +3555,20 @@ document.getElementById('clear-filters')?.addEventListener('click', () => {
   if(document.getElementById('filter-status')) document.getElementById('filter-status').value = '';
   if(document.getElementById('filter-date-from')) document.getElementById('filter-date-from').value = '';
   if(document.getElementById('filter-date-to')) document.getElementById('filter-date-to').value = '';
+  if(document.getElementById('filter-order-search')) document.getElementById('filter-order-search').value = '';
   
-  loadOrdersList(allOrders, {});
+  currentAdminOrderFilters = {};
+  loadOrdersList(allOrders, currentAdminOrderFilters);
+});
+
+document.getElementById('filter-order-search')?.addEventListener('input', () => {
+  currentAdminOrderFilters = {
+    status: document.getElementById('filter-status')?.value || null,
+    dateFrom: document.getElementById('filter-date-from')?.value || null,
+    dateTo: document.getElementById('filter-date-to')?.value || null,
+    search: document.getElementById('filter-order-search')?.value || null
+  };
+  loadOrdersList(allOrders, currentAdminOrderFilters);
 });
 
 // Accesos rápidos del encabezado administrativo.
@@ -3311,6 +3609,8 @@ window.viewOrder = async function(orderId) {
       CANCELLED: 'Cancelado',
       DELIVERED: 'Entregado'
     };
+    const nextOrderStatuses = { PENDING: ['CONFIRMED', 'CANCELLED'], CONFIRMED: ['PAID', 'CANCELLED'], PAID: ['DELIVERED'], CANCELLED: [], DELIVERED: [] };
+    const statusChoices = [order.status, ...(nextOrderStatuses[order.status] || [])];
     
     content.innerHTML = `
       <div class="order-detail-info">
@@ -3341,7 +3641,7 @@ window.viewOrder = async function(orderId) {
         <div class="order-detail-row">
           <strong>Estado:</strong>
           <select id="order-detail-status" class="order-status-select">
-            ${Object.entries(orderStatusLabels).map(([status, label]) => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${label}</option>`).join('')}
+            ${statusChoices.map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${orderStatusLabels[status]}</option>`).join('')}
           </select>
         </div>
         <div class="order-detail-row">
@@ -3350,8 +3650,23 @@ window.viewOrder = async function(orderId) {
         </div>
         <div class="order-detail-row">
           <strong>Método de Pago:</strong>
-          <span>${order.paymentMethod}</span>
+          <span>${sanitizeText(order.paymentMethod)}</span>
         </div>
+        <section class="order-audit-history" aria-label="Historial del pedido">
+          <h3>Historial</h3>
+          <ol>${(order.statusHistory || []).map(entry => `<li><strong>${orderStatusLabels[entry.toStatus] || sanitizeText(entry.toStatus)}</strong><span>${new Date(entry.createdAt).toLocaleString('es-GT')}</span><small>${sanitizeText(entry.changedBy?.name || (entry.fromStatus ? 'Administrador' : 'Sistema'))}</small></li>`).join('') || '<li>Sin historial disponible.</li>'}</ol>
+        </section>
+        <section class="order-proof-admin" aria-label="Comprobante de transferencia">
+          <h3>Comprobante</h3>
+          ${order.paymentProof ? `<a class="proof-link" href="/api/orders/${encodeURIComponent(order.id)}/payment-proof" target="_blank" rel="noopener">Abrir ${sanitizeText(order.paymentProof.originalName)} (${Math.ceil(order.paymentProof.sizeBytes / 1024)} KB)</a>` : '<p>Aún no se ha adjuntado comprobante.</p>'}
+        </section>
+        <section class="order-internal-notes" aria-label="Notas privadas para administración">
+          <h3>Notas internas <span>Solo visibles para administración</span></h3>
+          <ol>${(order.internalNotes || []).map(note => `<li><p>${sanitizeText(note.body)}</p><small>${sanitizeText(note.author?.name || 'Administración')} · ${new Date(note.createdAt).toLocaleString('es-GT')}</small></li>`).join('') || '<li>Sin notas internas.</li>'}</ol>
+          <label for="admin-order-note">Agregar nota privada</label>
+          <textarea id="admin-order-note" rows="3" maxlength="2000" placeholder="Seguimiento, comprobación o coordinación de entrega"></textarea>
+          <button type="button" id="save-order-note" class="admin-btn">Guardar nota privada</button>
+        </section>
       </div>
     `;
     
@@ -3386,6 +3701,23 @@ document.getElementById('close-order-detail')?.addEventListener('click', () => {
 });
 
 document.addEventListener('click', async (event) => {
+  if(event.target.id === 'save-order-note'){
+    const modal = document.getElementById('order-detail-modal');
+    const orderId = modal.dataset.orderId;
+    const field = document.getElementById('admin-order-note');
+    const body = field?.value.trim();
+    if(!orderId || !body) { showToast('Escribe una nota antes de guardarla.', 'error'); return; }
+    event.target.disabled = true;
+    try {
+      const response = await fetch(`/api/orders/${encodeURIComponent(orderId)}/notes`, { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${authToken}`}, body:JSON.stringify({body}) });
+      const data = await response.json();
+      if(!response.ok) throw new Error(data.error || 'No se pudo guardar la nota.');
+      showToast('Nota privada guardada.');
+      await window.viewOrder(orderId);
+    } catch(error) { showToast(error.message, 'error'); }
+    finally { event.target.disabled = false; }
+    return;
+  }
   if(event.target.id !== 'save-order-status') return;
   const modal = document.getElementById('order-detail-modal');
   const orderId = modal.dataset.orderId;
@@ -4046,6 +4378,20 @@ document.querySelectorAll('.admin-tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     switchAdminTab(btn.dataset.tab);
   });
+  btn.addEventListener('keydown', event => {
+    const tabs = [...document.querySelectorAll('.admin-tab-btn')];
+    const index = tabs.indexOf(btn);
+    let next = null;
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % tabs.length;
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index - 1 + tabs.length) % tabs.length;
+    if (event.key === 'Home') next = 0;
+    if (event.key === 'End') next = tabs.length - 1;
+    if (next !== null) {
+      event.preventDefault();
+      tabs[next].focus();
+      switchAdminTab(tabs[next].dataset.tab);
+    }
+  });
 });
 
 // Cierre genérico de modales de administración: click en el backdrop o tecla Escape
@@ -4227,3 +4573,5 @@ document.addEventListener('DOMContentLoaded', () => {
     { y: 0, opacity: 1, duration: 1, delay: 0.7, ease: 'power3.out' }
   );
 });
+
+window.BALAM_APP = { loadApiData, getCategories: () => categoriesData, sanitizeText, sanitizeImageUrl, trackEvent: trackAnalytics, openArtwork: art => { currentHotspotData = { ...art, desc: art.description, image: art.imageUrl || art.room?.imageUrl }; openModal(currentHotspotData); } };

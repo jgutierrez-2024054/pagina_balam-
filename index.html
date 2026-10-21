@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BALAM — Galería de Arte Virtual</title>
 
 <!-- Meta tags básicos -->
@@ -39,6 +39,8 @@
 </head>
 <body>
 
+<a class="skip-link" href="#landing-hero">Saltar al contenido</a>
+
 <div id="cursor">VER</div>
 
 <!-- ========== BANNER DE VISTA PREVIA PARA ADMINISTRADOR ========== -->
@@ -55,7 +57,8 @@
   <div class="nav-brand">BALAM</div>
   <div class="nav-main-links">
     <a href="#/" data-nav="landing">Inicio</a>
-    <button id="categories-toggle" class="categories-toggle">
+    <a href="#/obras" data-nav="catalog">Obras</a>
+      <button id="categories-toggle" class="categories-toggle" type="button" aria-expanded="false" aria-controls="categories-panel">
       <span>Categorías</span>
       <span class="chevron">▾</span>
     </button>
@@ -83,6 +86,7 @@
       <div class="panel-column-title">Explorar</div>
       <ul class="panel-column-links">
         <li><a href="#/selector" data-nav="collections">Colecciones disponibles</a></li>
+        <li><a href="#/obras" data-nav="catalog">Catálogo de obras</a></li>
         <li><a href="#/libros" data-nav="books">Nuestros libros</a></li>
       </ul>
     </div>
@@ -108,6 +112,26 @@
     <p>Una colección privada, abierta al desplazamiento. Explora las salas y descubre cada obra en detalle.</p>
     <button id="start-experience" class="landing-btn">Comienza tu experiencia</button>
   </section>
+</div>
+
+<!-- Catálogo independiente de obras con filtros, favoritos y fichas visuales. -->
+<div id="view-catalog" class="view" style="display:none;">
+  <header class="view-header"><div class="brand">BALAM</div><div class="room-tag">Catálogo de Obras</div></header>
+  <main class="public-catalog">
+    <section class="catalog-intro"><div class="eyebrow">Colección BALAM</div><h1>Obras para descubrir</h1><p>Explora piezas originales, conoce su historia y consulta su disponibilidad.</p></section>
+    <section class="catalog-controls" aria-label="Filtros del catálogo">
+      <label>Buscar<input id="catalog-search" type="search" placeholder="Título o artista" autocomplete="off"></label>
+      <label>Categoría<select id="catalog-category"><option value="">Todas</option></select></label>
+      <label>Disponibilidad<select id="catalog-status"><option value="">Cualquiera</option><option value="AVAILABLE">Disponible</option><option value="RESERVED">Reservada</option><option value="SOLD">Vendida</option></select></label>
+      <label>Ordenar<select id="catalog-sort"><option value="newest">Más recientes</option><option value="price-asc">Precio: menor a mayor</option><option value="price-desc">Precio: mayor a menor</option></select></label>
+      <label>Precio mínimo (Q)<input id="catalog-min-price" type="number" min="0" step="1" inputmode="numeric"></label>
+      <label>Precio máximo (Q)<input id="catalog-max-price" type="number" min="0" step="1" inputmode="numeric"></label>
+      <label class="catalog-favorites-filter"><input id="catalog-favorites-only" type="checkbox"> Solo mis favoritos</label>
+    </section>
+    <p id="catalog-results-count" class="catalog-results-count" aria-live="polite"></p>
+    <section id="public-artworks-grid" class="public-artworks-grid" aria-label="Obras"></section>
+    <nav id="catalog-pagination" class="catalog-pagination" aria-label="Páginas del catálogo"></nav>
+  </main>
 </div>
 
 <!-- ========== VISTA 4: Nuestros Libros ========== -->
@@ -239,8 +263,8 @@
 </div>
 
 <!-- Modal para tooltip rápido (se mantiene para hover en Vista 2) -->
-<div id="modal-backdrop">
-  <div id="modal">
+<div id="modal-backdrop" aria-hidden="true">
+  <div id="modal" role="dialog" aria-modal="true" aria-labelledby="m-title" tabindex="-1">
     <button id="modal-close" aria-label="Cerrar">✕</button>
     <div class="m-visual"><div class="canvas" id="m-canvas"></div><div class="glass"></div></div>
     <div class="m-body">
@@ -298,6 +322,7 @@
         <div id="payment-options">
           <!-- Opciones de pago generadas dinámicamente -->
         </div>
+        <p id="payment-instructions" class="payment-instructions" role="status" aria-live="polite">Elige un método para ver las instrucciones.</p>
       </div>
 
       <button id="confirm-purchase" class="purchase-btn">Confirmar interés</button>
@@ -482,6 +507,7 @@
     <div id="orders-list-container" class="orders-list">
       <!-- Pedidos generados dinámicamente -->
     </div>
+    <button id="my-orders-load-more" class="admin-btn" type="button" style="display:none;">Cargar más pedidos</button>
   </main>
 </div>
 
@@ -525,40 +551,41 @@
   </header>
 
   <!-- Barra de Navegación por Módulos del Administrador -->
-  <nav class="admin-nav-tabs" aria-label="Navegación de administración">
-    <button class="admin-tab-btn active" data-tab="overview">
+  <nav class="admin-nav-tabs" role="tablist" aria-label="Navegación de administración">
+    <button class="admin-tab-btn active" id="admin-tab-button-overview" data-tab="overview" role="tab" aria-selected="true" aria-controls="admin-tab-overview" tabindex="0">
       <span class="tab-icon"></span>
       <span class="tab-label">Resumen & Métricas</span>
     </button>
-    <button class="admin-tab-btn" data-tab="rooms">
+    <button class="admin-tab-btn" id="admin-tab-button-rooms" data-tab="rooms" role="tab" aria-selected="false" aria-controls="admin-tab-rooms" tabindex="-1">
       <span class="tab-icon"></span>
       <span class="tab-label">Salas</span>
     </button>
-    <button class="admin-tab-btn" data-tab="artworks">
+    <button class="admin-tab-btn" id="admin-tab-button-artworks" data-tab="artworks" role="tab" aria-selected="false" aria-controls="admin-tab-artworks" tabindex="-1">
       <span class="tab-icon"></span>
       <span class="tab-label">Obras de Arte</span>
     </button>
-    <button class="admin-tab-btn" data-tab="books">
+    <button class="admin-tab-btn" id="admin-tab-button-books" data-tab="books" role="tab" aria-selected="false" aria-controls="admin-tab-books" tabindex="-1">
       <span class="tab-icon"></span>
       <span class="tab-label">Libros</span>
     </button>
-    <button class="admin-tab-btn" data-tab="categories">
+    <button class="admin-tab-btn" id="admin-tab-button-categories" data-tab="categories" role="tab" aria-selected="false" aria-controls="admin-tab-categories" tabindex="-1">
       <span class="tab-icon"></span>
       <span class="tab-label">Categorías</span>
     </button>
-    <button class="admin-tab-btn" data-tab="payments">
+    <button class="admin-tab-btn" id="admin-tab-button-payments" data-tab="payments" role="tab" aria-selected="false" aria-controls="admin-tab-payments" tabindex="-1">
       <span class="tab-icon"></span>
       <span class="tab-label">Métodos de Pago</span>
     </button>
-    <button class="admin-tab-btn" data-tab="orders">
+    <button class="admin-tab-btn" id="admin-tab-button-orders" data-tab="orders" role="tab" aria-selected="false" aria-controls="admin-tab-orders" tabindex="-1">
       <span class="tab-icon"></span>
       <span class="tab-label">Pedidos & Ventas</span>
+      <span id="admin-order-notification" class="admin-order-notification" role="status" aria-live="polite" aria-atomic="true" hidden></span>
     </button>
-    <button class="admin-tab-btn" data-tab="about">
+    <button class="admin-tab-btn" id="admin-tab-button-about" data-tab="about" role="tab" aria-selected="false" aria-controls="admin-tab-about" tabindex="-1">
       <span class="tab-icon"></span>
       <span class="tab-label">Acerca de</span>
     </button>
-    <button class="admin-tab-btn" data-tab="hotspots">
+    <button class="admin-tab-btn" id="admin-tab-button-hotspots" data-tab="hotspots" role="tab" aria-selected="false" aria-controls="admin-tab-hotspots" tabindex="-1">
       <span class="tab-icon"></span>
       <span class="tab-label">Editor Hotspots</span>
     </button>
@@ -567,7 +594,7 @@
   <!-- Contenedor Principal de Pestañas -->
   <main class="admin-tab-container">
     <!-- Pestaña 1: Resumen & Métricas -->
-    <section id="admin-tab-overview" class="admin-tab-panel active">
+    <section id="admin-tab-overview" class="admin-tab-panel active" role="tabpanel" aria-labelledby="admin-tab-button-overview" tabindex="0">
       <div class="tab-panel-header">
         <div>
           <h2>Panel de Control</h2>
@@ -619,6 +646,11 @@
         </div>
       </div>
 
+      <section class="admin-section admin-section-wide analytics-section" aria-labelledby="analytics-title">
+        <div class="admin-section-heading"><div><span class="section-kicker">Uso del sitio</span><h2 id="analytics-title">Interés en el catálogo</h2></div><span>Últimos 30 días</span></div>
+        <div id="analytics-summary" class="analytics-summary" aria-live="polite"><p class="admin-empty-state">Cargando métricas…</p></div>
+      </section>
+
       <div class="admin-quick-shortcuts">
         <div class="shortcut-card" id="shortcut-add-artwork">
           <span class="shortcut-icon"></span>
@@ -644,7 +676,7 @@
     </section>
 
     <!-- Pestaña 2: Gestión de Salas -->
-    <section id="admin-tab-rooms" class="admin-tab-panel">
+    <section id="admin-tab-rooms" class="admin-tab-panel" role="tabpanel" aria-labelledby="admin-tab-button-rooms" tabindex="0" hidden>
       <div class="tab-panel-header">
         <div>
           <h2>Gestión de Salas de Exhibición</h2>
@@ -660,7 +692,7 @@
     </section>
 
     <!-- Pestaña 3: Gestión de Obras de Arte -->
-    <section id="admin-tab-artworks" class="admin-tab-panel">
+    <section id="admin-tab-artworks" class="admin-tab-panel" role="tabpanel" aria-labelledby="admin-tab-button-artworks" tabindex="0" hidden>
       <div class="tab-panel-header">
         <div>
           <h2>Catálogo de Obras de Arte</h2>
@@ -701,7 +733,7 @@
     </section>
 
     <!-- Pestaña 4: Gestión de Libros -->
-    <section id="admin-tab-books" class="admin-tab-panel">
+    <section id="admin-tab-books" class="admin-tab-panel" role="tabpanel" aria-labelledby="admin-tab-button-books" tabindex="0" hidden>
       <div class="tab-panel-header">
         <div>
           <h2>Publicaciones y Libros de Arte</h2>
@@ -717,7 +749,7 @@
     </section>
 
     <!-- Pestaña 5: Gestión de Categorías -->
-    <section id="admin-tab-categories" class="admin-tab-panel">
+    <section id="admin-tab-categories" class="admin-tab-panel" role="tabpanel" aria-labelledby="admin-tab-button-categories" tabindex="0" hidden>
       <div class="tab-panel-header">
         <div>
           <h2>Categorías y Técnicas Artísticas</h2>
@@ -733,7 +765,7 @@
     </section>
 
     <!-- Pestaña 6: Métodos de Pago -->
-    <section id="admin-tab-payments" class="admin-tab-panel">
+    <section id="admin-tab-payments" class="admin-tab-panel" role="tabpanel" aria-labelledby="admin-tab-button-payments" tabindex="0" hidden>
       <div class="tab-panel-header">
         <div>
           <h2>Métodos de Pago</h2>
@@ -749,12 +781,13 @@
     </section>
 
     <!-- Pestaña 7: Pedidos y Ventas -->
-    <section id="admin-tab-orders" class="admin-tab-panel">
+    <section id="admin-tab-orders" class="admin-tab-panel" role="tabpanel" aria-labelledby="admin-tab-button-orders" tabindex="0" hidden>
       <div class="tab-panel-header">
         <div>
           <h2>Gestión de Pedidos & Ventas</h2>
           <p class="tab-subtitle">Supervisa las intenciones de compra, confirma pagos y actualiza entregas.</p>
         </div>
+        <a class="admin-btn" href="/api/admin/orders.csv" download="balam-pedidos.csv">Exportar CSV</a>
       </div>
 
       <div class="orders-filters-card">
@@ -778,6 +811,10 @@
             <label for="filter-date-to">Hasta:</label>
             <input type="date" id="filter-date-to">
           </div>
+          <div class="filter-group filter-order-search">
+            <label for="filter-order-search">Buscar pedido, cliente o artículo:</label>
+            <input type="search" id="filter-order-search" placeholder="Folio, nombre, correo o título">
+          </div>
           <div class="filter-actions-group">
             <button id="apply-filters" class="admin-btn primary">Filtrar</button>
             <button id="clear-filters" class="admin-btn">Limpiar</button>
@@ -788,6 +825,7 @@
       <div id="orders-list" class="admin-orders-list">
         <!-- Lista de pedidos generada dinámicamente -->
       </div>
+      <button id="admin-orders-load-more" class="admin-btn" type="button" style="display:none;">Cargar más pedidos</button>
 
       <div class="admin-section admin-section-wide" style="margin-top: 30px;">
         <h2>Histórico de Ventas Mensuales</h2>
@@ -798,7 +836,7 @@
     </section>
 
     <!-- Pestaña 8: Acerca de Nosotros -->
-    <section id="admin-tab-about" class="admin-tab-panel">
+    <section id="admin-tab-about" class="admin-tab-panel" role="tabpanel" aria-labelledby="admin-tab-button-about" tabindex="0" hidden>
       <div class="tab-panel-header">
         <div>
           <h2>Información Institucional</h2>
@@ -814,7 +852,7 @@
     </section>
 
     <!-- Pestaña 9: Editor de Hotspots -->
-    <section id="admin-tab-hotspots" class="admin-tab-panel">
+    <section id="admin-tab-hotspots" class="admin-tab-panel" role="tabpanel" aria-labelledby="admin-tab-button-hotspots" tabindex="0" hidden>
       <div class="tab-panel-header">
         <div>
           <h2>Editor Visual de Hotspots</h2>
@@ -883,6 +921,7 @@
           <span class="detail-value" id="confirmation-payment">---</span>
         </div>
       </div>
+      <p id="confirmation-next-steps" class="confirmation-next-steps" role="status" aria-live="polite"></p>
     </div>
     <button id="confirmation-modal-close" class="confirmation-modal-btn">Ver Mis Pedidos</button>
   </div>
@@ -952,6 +991,10 @@
         <input type="text" id="book-price" name="price" required>
       </div>
       <div class="form-group">
+        <label for="book-stock">Unidades disponibles</label>
+        <input type="number" id="book-stock" name="stock" min="0" step="1" value="1" required>
+      </div>
+      <div class="form-group">
         <label for="book-description">Descripción</label>
         <textarea id="book-description" name="description" rows="4"></textarea>
       </div>
@@ -1009,6 +1052,12 @@
       <div class="form-group">
         <label for="artwork-description">Descripción</label>
         <textarea id="artwork-description" name="description" rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="artwork-image-url">Fotografía de la obra (URL)</label>
+        <input type="url" id="artwork-image-url" name="imageUrl" placeholder="https://...">
+        <label for="artwork-image-file">O subir fotografía</label>
+        <input type="file" id="artwork-image-file" accept="image/jpeg,image/png,image/webp,image/gif">
       </div>
       <div class="form-group">
         <div class="form-group">
@@ -1096,6 +1145,11 @@
       <div class="form-group">
         <label for="payment-method-icon">Icono (emoji)</label>
         <input type="text" id="payment-method-icon" name="icon" required placeholder="ej: 💳">
+      </div>
+      <div class="form-group">
+        <label for="payment-method-instructions">Instrucciones para el cliente</label>
+        <textarea id="payment-method-instructions" name="instructions" rows="4" maxlength="2000" placeholder="Te enviaremos los datos bancarios cuando confirmemos tu pedido."></textarea>
+        <small>Para transferencia manual, agrega aquí los datos de la cuenta que quieras compartir y el proceso de confirmación. El pago se verificará manualmente.</small>
       </div>
       <div class="form-group">
         <label class="toggle-field" for="payment-method-active">
@@ -1278,5 +1332,6 @@
 </div>
 
 <script src="js/main.js"></script>
+<script src="js/catalog.js"></script>
 </body>
 </html>
