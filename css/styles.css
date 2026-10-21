@@ -542,6 +542,7 @@ header .room-tag{
   grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));
   gap:30px;
 }
+#rooms-grid .room-masonry-column{display:contents}
 @media (max-width: 760px){
   #rooms-grid{
     grid-template-columns:1fr;
@@ -4809,13 +4810,11 @@ button:focus-visible,a:focus-visible,[role="tab"]:focus-visible,input:focus-visi
   #selector-hero .eyebrow{position:relative;margin:0 0 7px;font-size:9px;letter-spacing:.17em}
   #selector-hero h1{position:relative;font-size:2.35rem;line-height:1;letter-spacing:-.04em}
   #selector-hero p{position:relative;max-width:340px;margin:8px 0 0;font-size:12px;line-height:1.5}
-  #rooms-grid{display:block;column-count:2;column-gap:11px;padding:16px 12px 32px}
-  .room-card{display:inline-block;width:100%;margin:0 0 11px;break-inside:avoid;overflow:hidden;border:0;border-radius:15px;background:transparent;box-shadow:0 9px 22px rgba(0,0,0,.18);vertical-align:top}
+  #rooms-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:11px;padding:16px 12px 32px}
+  #rooms-grid .room-masonry-column{display:flex;min-width:0;flex-direction:column;gap:11px}
+  .room-card{display:block;width:100%;margin:0;break-inside:avoid;overflow:hidden;border:0;border-radius:15px;background:transparent;box-shadow:0 9px 22px rgba(0,0,0,.18);vertical-align:top}
   .room-card:hover{transform:none}
-  .room-card .thumbnail{height:198px;aspect-ratio:auto;background-position:center;background-size:cover}
-  .room-card:nth-child(4n + 2) .thumbnail{height:242px}
-  .room-card:nth-child(4n + 3) .thumbnail{height:166px}
-  .room-card:nth-child(4n) .thumbnail{height:218px}
+  .room-card .thumbnail{height:var(--mobile-room-card-height,198px);aspect-ratio:auto;background-position:center;background-size:cover}
   .room-card .thumbnail::after{background:linear-gradient(180deg,rgba(5,12,8,.02) 35%,rgba(5,12,8,.74) 100%)}
   .room-card .card-body{position:absolute;inset:auto 0 0;padding:32px 12px 12px;background:linear-gradient(0deg,rgba(5,12,8,.54),transparent);pointer-events:none}
   .room-card .card-num{margin:0 0 4px;font-size:9px;color:#f1d47a}
@@ -4872,6 +4871,8 @@ button:focus-visible,a:focus-visible,[role="tab"]:focus-visible,input:focus-visi
 }
 @media (max-width:390px){
   #rooms-grid,.public-artworks-grid,#view-category #category-artworks-grid{column-gap:9px;padding-right:10px;padding-left:10px}
+  #rooms-grid{gap:9px}
+  .room-masonry-column{gap:9px}
   .room-card .card-title{font-size:1rem}
   .public-artwork-copy h2{font-size:.94rem}
 }

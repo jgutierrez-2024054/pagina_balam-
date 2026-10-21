@@ -7,6 +7,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
+const { put: putBlob } = require('@vercel/blob');
 const { PrismaClient } = require('@prisma/client');
 const { authenticateToken, requireAdmin, requireClientOrAdmin, generateToken } = require('./middleware/auth');
 const { isValidOrderTransition } = require('./domain/order-status');
@@ -74,6 +75,15 @@ const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHea
 app.use('/api/auth', authLimiter);
 const analyticsLimiter = rateLimit({ windowMs: 60 * 1000, limit: 60, standardHeaders: 'draft-8', legacyHeaders: false });
 let lastAnalyticsPruneAt = 0;
+
+// La galería es editable desde el panel: evita que navegador o CDN reutilicen
+// respuestas anteriores después de una actualización de contenido.
+app.use('/api', (_req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
 
 function setSessionCookie(res, token) {
   res.cookie('balam_session', token, {
@@ -209,9 +219,6 @@ app.post('/api/auth/reset-password', async (req, res) => {
 // ========================= UPLOADS =========================
 app.post('/api/uploads/image', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    if (isServerless) {
-      return res.status(501).json({ error: 'La carga de imágenes aún no está configurada para producción.' });
-    }
     const dataUrl = cleanString(req.body.dataUrl, 8 * 1024 * 1024);
     const originalName = cleanString(req.body.fileName, 120);
     const match = dataUrl.match(/^data:(image\/(?:jpeg|png|webp|gif));base64,([A-Za-z0-9+/=]+)$/);
@@ -219,9 +226,29 @@ app.post('/api/uploads/image', authenticateToken, requireAdmin, async (req, res)
     const ext = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'image/gif': '.gif' }[match[1]];
     const safeBase = (path.basename(originalName, path.extname(originalName)).replace(/[^a-zA-Z0-9_-]/g, '-') || 'imagen').slice(0, 50);
     const fileName = `${Date.now()}-${crypto.randomBytes(5).toString('hex')}-${safeBase}${ext}`;
-    fs.writeFileSync(path.join(uploadsDir, fileName), Buffer.from(match[2], 'base64'));
+    const imageBuffer = Buffer.from(match[2], 'base64');
+    if (imageBuffer.length > 3 * 1024 * 1024) return res.status(413).json({ error: 'La imagen optimizada no puede superar 3 MB.' });
+
+    if (process.env.VERCEL) {
+      const blob = await putBlob(`gallery/${fileName}`, imageBuffer, {
+        access: 'public',
+        addRandomSuffix: true,
+        contentType: match[1],
+        cacheControlMaxAge: 60 * 60 * 24 * 30
+      });
+      return res.status(201).json({ url: blob.url, fileName: blob.pathname });
+    }
+
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    fs.writeFileSync(path.join(uploadsDir, fileName), imageBuffer);
     res.status(201).json({ url: `/uploads/${fileName}`, fileName });
-  } catch (error) { handlePrismaError(error, res, 'Error al subir imagen.'); }
+  } catch (error) {
+    console.error('No se pudo almacenar la imagen:', error);
+    const message = /token|oidc|blob store/i.test(error?.message || '')
+      ? 'Conecta un almacenamiento público de Vercel Blob al proyecto para guardar imágenes en producción.'
+      : 'No se pudo guardar la imagen. Verifica el almacenamiento y vuelve a intentarlo.';
+    res.status(503).json({ error: message });
+  }
 });
 
 // ========================= SALAS =========================

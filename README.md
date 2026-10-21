@@ -136,7 +136,13 @@ Variables mínimas:
 - `ADMIN_PASSWORD`
 
 ### Imágenes subidas
-Las imágenes nuevas se guardan en `uploads/`. En Render el filesystem del servicio puede ser efímero; para producción real conviene conectar posteriormente un almacenamiento persistente (Cloudinary, S3, Cloudflare R2, etc.). Las URLs externas siguen funcionando sin ese cambio.
+En desarrollo local y en servidores Node con disco escribible, las imágenes nuevas se guardan en `uploads/` (el disco de algunos proveedores, como Render, puede ser efímero). En Vercel, la API usa Vercel Blob porque el filesystem de funciones serverless no es almacenamiento persistente:
+
+1. En el proyecto de Vercel abre **Storage** y crea/conecta un store **Blob** público.
+2. Confirma que `BLOB_READ_WRITE_TOKEN` esté disponible en el entorno **Production** (Vercel lo configura al conectar el store).
+3. Vuelve a desplegar para que la función reciba la variable.
+
+Las imágenes se optimizan en el navegador y el endpoint acepta hasta 3 MB por archivo. Las imágenes existentes que ya estén guardadas como URLs externas o dentro de `images/` siguen funcionando.
 
 ## Seguridad y calidad
 - Contraseñas con hash `bcryptjs`.

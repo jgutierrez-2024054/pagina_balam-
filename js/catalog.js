@@ -32,7 +32,7 @@ async function loadPublicCatalog(page = 1){
     if(minPrice) query.set('minPrice', minPrice);
     if(maxPrice) query.set('maxPrice', maxPrice);
     if(favoritesOnly) query.set('ids', [...getFavoriteIds()].join(','));
-    const response = await fetch(`/api/artworks?${query}`);
+    const response = await fetch(`/api/artworks?${query}`, { cache: 'no-store' });
     const data = await response.json();
     if(!response.ok) throw new Error(data.error || 'No se pudo cargar el catálogo.');
     const results = document.getElementById('catalog-results-count');

@@ -13,7 +13,11 @@ let roomsData = [];
 let booksData = [];
 let categoriesData = [];
 let paymentMethodsData = [];
+let aboutData = null;
 let dataLoaded = false;
+let activeViewName = 'landing';
+let publicContentRefreshTimer = null;
+let publicContentRefreshInFlight = false;
 
 /* ============================================================
    CONTROLADORES DEL HEADER DE ADMINISTRACIÓN
@@ -58,6 +62,7 @@ function closeAdminAccountPanel(){
 
 function openPublicGalleryPreview(){
   closeAdminAccountPanel();
+  invalidateGalleryData();
   renderRoomSelector();
   switchView('selector');
 }
@@ -244,16 +249,54 @@ if(document.readyState === 'loading'){
 async function loadApiData(force = false){
   if(dataLoaded && !force) return;
   const responses = await Promise.all([
-    fetch('/api/rooms'), fetch('/api/books'), fetch('/api/categories'), fetch('/api/payment-methods')
+    fetch('/api/rooms', { cache: 'no-store' }),
+    fetch('/api/books', { cache: 'no-store' }),
+    fetch('/api/categories', { cache: 'no-store' }),
+    fetch('/api/payment-methods', { cache: 'no-store' }),
+    fetch('/api/about', { cache: 'no-store' })
   ]);
   if(responses.some(response => !response.ok)) throw new Error('No se pudo cargar la información de la galería.');
-  const [rooms, books, categories, paymentMethods] = await Promise.all(responses.map(response => response.json()));
+  const [rooms, books, categories, paymentMethods, about] = await Promise.all(responses.map(response => response.json()));
   roomsData = rooms || [];
   booksData = books || [];
   categoriesData = categories || [];
   paymentMethodsData = paymentMethods || [];
+  aboutData = about || null;
   dataLoaded = true;
   renderCategoriesPanel();
+}
+
+function invalidateGalleryData(){
+  dataLoaded = false;
+}
+
+async function refreshPublicContent(){
+  if(publicContentRefreshInFlight || document.visibilityState !== 'visible' || !['selector', 'room', 'catalog', 'books', 'about', 'category'].includes(activeViewName)) return;
+  publicContentRefreshInFlight = true;
+  const viewBeforeRefresh = activeViewName;
+  const previous = JSON.stringify([roomsData, booksData, categoriesData, paymentMethodsData, aboutData]);
+  try {
+    await loadApiData(true);
+    if(viewBeforeRefresh !== activeViewName || previous === JSON.stringify([roomsData, booksData, categoriesData, paymentMethodsData, aboutData])) return;
+    if(activeViewName === 'selector') renderRoomSelector();
+    else if(activeViewName === 'room' && roomsData.length && Number.isInteger(currentRoomIndex)) navigateToRoom(Math.min(currentRoomIndex, roomsData.length - 1));
+    else if(activeViewName === 'room') { renderRoomSelector(); switchView('selector'); }
+    else if(activeViewName === 'catalog') loadPublicCatalog();
+    else if(activeViewName === 'books') renderBooks();
+    else if(activeViewName === 'about') loadAboutContent();
+    else if(activeViewName === 'category') navigateToCategory(decodeURIComponent(location.hash.split('/')[2] || ''));
+  } catch(error) {
+    console.warn('No se pudo actualizar la galería publicada.', error);
+  } finally {
+    publicContentRefreshInFlight = false;
+  }
+}
+
+function startPublicContentRefresh(){
+  if(publicContentRefreshTimer) clearInterval(publicContentRefreshTimer);
+  publicContentRefreshTimer = setInterval(refreshPublicContent, 30000);
+  document.addEventListener('visibilitychange', refreshPublicContent);
+  window.addEventListener('focus', refreshPublicContent);
 }
 
 // Renderizar el panel de categorías del nav desde categoriesData
@@ -352,10 +395,33 @@ function sanitizeImageUrl(value){
 // Sube una imagen seleccionada por el administrador y devuelve su URL pública.
 async function uploadImageFile(file){
   if(!file) return '';
-  if(file.size > 6 * 1024 * 1024) throw new Error('La imagen no puede superar 6 MB.');
+  if(file.size > 12 * 1024 * 1024) throw new Error('La imagen no puede superar 12 MB.');
   if(!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type)) throw new Error('Formato de imagen no permitido.');
-  const dataUrl = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); });
-  const response = await fetch('/api/uploads/image', { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${authToken}`}, body:JSON.stringify({dataUrl, fileName:file.name}) });
+  let uploadFile = file;
+  const requestSafeSize = 3 * 1024 * 1024;
+  if(file.size > requestSafeSize){
+    if(file.type === 'image/gif') throw new Error('Para GIF animado usa un archivo de hasta 3 MB.');
+    const objectUrl = URL.createObjectURL(file);
+    try {
+      const image = new Image();
+      image.src = objectUrl;
+      await image.decode();
+      const scale = Math.min(1, 2000 / Math.max(image.naturalWidth, image.naturalHeight));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      const context = canvas.getContext('2d');
+      if(!context) throw new Error('El navegador no pudo preparar la imagen. Prueba con otro archivo.');
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      for(const quality of [0.84, 0.76, 0.66, 0.56]){
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', quality));
+        if(blob && blob.size <= requestSafeSize){ uploadFile = new File([blob], file.name.replace(/\.[^.]+$/, '.webp'), { type: 'image/webp' }); break; }
+      }
+      if(uploadFile === file) throw new Error('No se pudo reducir la imagen para subirla. Prueba con una imagen más pequeña.');
+    } finally { URL.revokeObjectURL(objectUrl); }
+  }
+  const dataUrl = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(uploadFile); });
+  const response = await fetch('/api/uploads/image', { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${authToken}`}, body:JSON.stringify({dataUrl, fileName:uploadFile.name}) });
   const data = await response.json();
   if(!response.ok) throw new Error(data.error || 'No se pudo subir la imagen.');
   return data.url;
@@ -597,9 +663,18 @@ function renderRoomSelector(){
     
     const allRooms = getAllRooms();
 
+    const masonryColumns = [0, 1].map(() => {
+      const column = document.createElement('div');
+      column.className = 'room-masonry-column';
+      column.dataset.height = '0';
+      elements.roomsGrid.appendChild(column);
+      return column;
+    });
     allRooms.forEach((room, index) => {
       const card = document.createElement('div');
       card.className = 'room-card';
+      card.dataset.roomIndex = String(index);
+      card.style.setProperty('--mobile-room-card-height', `${[198, 242, 166, 218][index % 4]}px`);
       card.onclick = () => navigateToRoom(index);
       
 
@@ -613,10 +688,13 @@ function renderRoomSelector(){
       `;
       
       const thumbnail = card.querySelector('.thumbnail');
-      if(room.image){ thumbnail.style.backgroundImage = `url("${sanitizeImageUrl(room.image)}")`; }
+      if(room.image){ thumbnail.style.backgroundImage = `url("${sanitizeImageUrl(room.image)}"), ${gradientFor(room.artworks?.[0]?.palette || ['#1e3a5f','#3d6b8a','#eae4d3'])}`; }
       else if(room.artworks && room.artworks.length > 0){ thumbnail.style.backgroundImage = gradientFor(room.artworks[0].palette || ['#1e3a5f','#3d6b8a','#eae4d3']); }
       else { thumbnail.style.background = 'linear-gradient(160deg, var(--wall-2), var(--wall-3))'; }
-      elements.roomsGrid.appendChild(card);
+      const estimatedHeight = [198, 242, 166, 218][index % 4] + 78;
+      const targetColumn = Number(masonryColumns[0].dataset.height) <= Number(masonryColumns[1].dataset.height) ? masonryColumns[0] : masonryColumns[1];
+      targetColumn.appendChild(card);
+      targetColumn.dataset.height = String(Number(targetColumn.dataset.height) + estimatedHeight);
     });
   }).catch(error => {
     console.error('Error al cargar salas:', error);
@@ -1039,6 +1117,7 @@ async function confirmPurchaseInterest(){
    ============================================================ */
 
 function switchView(viewName, roomIndex = null){
+  activeViewName = viewName;
   const isAdminView = ['adminDashboard', 'adminLogin', 'forgotPassword', 'resetPassword'].includes(viewName);
   document.body.classList.toggle('admin-mode', isAdminView);
   document.body.classList.toggle('immersive-room', viewName === 'room');
@@ -1193,7 +1272,7 @@ function handleHashChange(){
 
 async function loadAboutContent(){
   try {
-    const response = await fetch('/api/about');
+    const response = await fetch('/api/about', { cache: 'no-store' });
     if(!response.ok) throw new Error('Error al cargar información');
     const data = await response.json();
     if(!data) return;
@@ -1977,6 +2056,7 @@ window.adjustBookStock = async function(bookId, delta){
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'No se pudo actualizar el inventario.');
+    invalidateGalleryData();
     showToast(`Inventario actualizado: ${data.stock} ejemplar${data.stock === 1 ? '' : 'es'}.`);
     await loadBooksList();
   } catch (error) { showToast(error.message, 'error'); }
@@ -2080,6 +2160,7 @@ window.togglePaymentMethodActive = async function(id, newActiveState) {
     });
 
     if (!response.ok) throw new Error('No se pudo actualizar el método de pago.');
+    invalidateGalleryData();
     loadPaymentMethodsList();
     showToast(`Método de pago ${newActiveState ? 'activado' : 'desactivado'}.`);
   } catch (error) {
@@ -2092,7 +2173,7 @@ async function loadAboutAdminPreview(){
   const container = document.getElementById('about-admin-preview');
   if(!container) return;
   try {
-    const response = await fetch('/api/about');
+    const response = await fetch('/api/about', { cache: 'no-store' });
     const data = await response.json();
     if(!data) {
       container.innerHTML = '<p class="admin-empty-state">No hay información cargada.</p>';
@@ -2319,6 +2400,7 @@ elements.backToHome.addEventListener('click', () => switchView('landing'));
 
 // Verificar si hay sesión guardada al cargar
 window.addEventListener('load', async () => {
+  startPublicContentRefresh();
   try {
     const response = await fetch('/api/auth/verify');
     if(!response.ok) throw new Error('Sesión inválida');
@@ -2841,6 +2923,7 @@ window.deleteRoom = async function(roomId){
     });
     const data = await response.json();
     if(!response.ok) throw new Error(data.error || 'No se pudo eliminar la sala.');
+    invalidateGalleryData();
     loadRoomsList();
     loadArtworksAdminList();
     alert('Sala eliminada exitosamente.');
@@ -2913,6 +2996,7 @@ document.getElementById('add-room-form').addEventListener('submit', async (e) =>
     }
     
     closeAddRoomModal();
+    invalidateGalleryData();
     loadRoomsList();
     alert(isEdit ? 'Sala actualizada exitosamente' : 'Sala creada exitosamente');
   } catch (error) {
@@ -2949,6 +3033,7 @@ document.getElementById('add-book-form').addEventListener('submit', async (e) =>
     }
     
     closeAddBookModal();
+    invalidateGalleryData();
     loadBooksList();
     alert(isEdit ? 'Libro actualizado exitosamente' : 'Libro creado exitosamente');
   } catch (error) {
@@ -2981,6 +3066,7 @@ window.deleteBook = async function(bookId){
   try {
     const response=await fetch(`/api/books/${bookId}`,{method:'DELETE',headers:{Authorization:`Bearer ${authToken}`}});
     const data=await response.json(); if(!response.ok) throw new Error(data.error || 'No se pudo eliminar el libro.');
+    invalidateGalleryData();
     await loadBooksList(); alert('Libro eliminado exitosamente.');
   } catch(error){ alert(error.message); }
 };
@@ -3098,6 +3184,7 @@ document.getElementById('add-artwork-form').addEventListener('submit', async (e)
     }
     
     closeAddArtworkModal();
+    invalidateGalleryData();
     alert(isEdit ? 'Obra actualizada exitosamente' : 'Obra creada exitosamente');
     
     // Recargar la lista de salas y el catálogo de obras
@@ -3176,6 +3263,7 @@ window.deleteArtwork = async function(artworkId) {
       const error = await response.json();
       throw new Error(error.error || 'Error al eliminar obra');
     }
+    invalidateGalleryData();
     
     alert('Obra eliminada exitosamente');
     loadRoomsList();
@@ -3287,6 +3375,7 @@ window.deleteCategory = async function(categorySlug) {
       const error = await response.json();
       throw new Error(error.error || 'Error al eliminar categoría');
     }
+    invalidateGalleryData();
     
     alert('Categoría eliminada exitosamente');
     loadCategoriesList();
@@ -3347,6 +3436,7 @@ document.getElementById('add-category-form').addEventListener('submit', async (e
     }
     
     closeAddCategoryModal();
+    invalidateGalleryData();
     alert(isEdit ? 'Categoría actualizada exitosamente' : 'Categoría creada exitosamente');
     loadCategoriesList();
   } catch (error) {
@@ -3441,6 +3531,7 @@ window.deletePaymentMethod = async function(paymentMethodId) {
       const error = await response.json();
       throw new Error(error.error || 'Error al eliminar método de pago');
     }
+    invalidateGalleryData();
     
     alert('Método de pago eliminado exitosamente');
     loadPaymentMethodsList();
@@ -3489,6 +3580,7 @@ document.getElementById('add-payment-method-form').addEventListener('submit', as
       const error = await response.json();
       throw new Error(error.error || 'Error al guardar método de pago');
     }
+    invalidateGalleryData();
     
     closeAddPaymentMethodModal();
     alert(isEdit ? 'Método de pago actualizado exitosamente' : 'Método de pago creado exitosamente');
@@ -3508,7 +3600,7 @@ function openEditAboutModal() {
   const modal = document.getElementById('edit-about-modal');
   
   // Cargar datos existentes
-  fetch('/api/about')
+  fetch('/api/about', { cache: 'no-store' })
     .then(response => response.json())
     .then(data => {
       if (data) {
@@ -3576,6 +3668,7 @@ document.getElementById('edit-about-form')?.addEventListener('submit', async (e)
     }
     
     closeEditAboutModal();
+    invalidateGalleryData();
     loadAboutAdminPreview();
     loadAboutContent();
     alert('Información institucional actualizada exitosamente');
